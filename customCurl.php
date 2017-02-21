@@ -1,5 +1,5 @@
 <?php
-class customCurl
+class CustomCurl
 {
     private $url = '',
             $timeout = 5,
@@ -17,7 +17,8 @@ class customCurl
             $output = '',
             $body = '',
             $header = '',
-            $responseCookies = [];
+            $responseCookies = [],
+            $curlErrNo = 0;
 
     private function __construct($url, $method)
     {
@@ -112,6 +113,7 @@ class customCurl
         $this->header = '';
         $this->body = '';
         $this->output = '';
+        $this->curlErrNo = 0;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -138,7 +140,8 @@ class customCurl
         curl_setopt($ch, CURLOPT_NOBODY, false);
         $this->output = curl_exec($ch);
         $this->ch = $ch;
-        if (curl_errno($ch) === 0 || ($this->ignoreCurlError && $output)) {
+        $this->curlErrNo = curl_errno($ch);
+        if ($this->curlErrNo === 0 || ($this->ignoreCurlError && $output)) {
             $headerSize = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
             $this->header = substr($this->output, 0, $headerSize);
             $this->body = substr($this->output, $headerSize);
@@ -167,18 +170,28 @@ class customCurl
         return $this->header;
     }
 
+    public function getCurlErrNo()
+    {
+        return $this->curlErrNo;
+    }
+
     public function getCookies()
     {
         return $this->responseCookies;
     }
 }
 
-$customCurl = customCurl::init('http://lab.imjs.work/server.php')
-                // ->set('postFields', ['a' => 'a', 'array' => ['key' => 'value']])
-                ->set('referer', 'http://lab.imjs.work/server.php')
-                ->set('ignoreCurlError', 1)
-                ->setHeader('X-Requested-With', 'XMLHttpRequest')
-                ->setCookies('a', 'b')
-                ->exec();
+$curlSet = CustomCurl::init('https://www.baidu.com')
+            // ->set('postFields', ['a' => 'a', 'array' => ['key' => 'value']])
+            ->set('referer', 'http://lab.imjs.work/server.php')
+            ->set('ignoreCurlError', 1)
+            ->set('timeout', 1)
+            ->setHeader('X-Requested-With', 'XMLHttpRequest')
+            ->setCookies('a', 'b');
 
-var_dump($customCurl->getHeader(), $customCurl->getCookies(), $customCurl->getBody());
+$curlObj = $curlSet->exec();
+if ($curlObj) {
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
+} else {
+    var_dump($curlSet->getCurlErrNo());
+}
