@@ -77,13 +77,13 @@ class CustomCurl
         return $this;
     }
 
-    public function setCookies($k, $v)
+    public function setCookie($k, $v)
     {
         $this->sendCookies[$k] = $v;
         return $this;
     }
 
-    public function clearCookies()
+    public function clearCookie()
     {
         $this->sendCookies = [];
         return $this;
