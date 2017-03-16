@@ -145,7 +145,7 @@ class CustomCurl
         $this->output = curl_exec($ch);
         $this->ch = $ch;
         $this->curlErrNo = curl_errno($ch);
-        if ($this->curlErrNo === 0 || ($this->ignoreCurlError && $output)) {
+        if ($this->curlErrNo === 0 || ($this->ignoreCurlError && $this->output)) {
             $headerSize = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
             $this->header = substr($this->output, 0, $headerSize);
             $this->body = substr($this->output, $headerSize);
