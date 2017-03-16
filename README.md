@@ -49,7 +49,7 @@ if ($curlObj) {
 $curlSet = CustomCurl::init('http://example.com')
             ->setCookie('a', 'b')     // 设置 Cookie，Key => Value
             ->clearCookies()          // 清空之前设置的所有 Cookie
-            ->setCookie('a', 'b');    // 重新设置 Cookie，Key => Value
+            ->setCookie('b', 'c');    // 重新设置 Cookie，Key => Value
 
 $curlObj = $curlSet->exec();
 if ($curlObj) {
@@ -64,7 +64,7 @@ if ($curlObj) {
 ```php
 $curlSet = CustomCurl::init('http://example.com/api')
             ->setHeader('X-PJAX', 'true')                         // 设置 Header，Key => Value
-            ->clearCookies()                                      // 清空之前设置的所有 Header
+            ->clearHeaders()                                      // 清空之前设置的所有 Header
             ->setHeader('X-Requested-With', 'XMLHttpRequest');    // 设置 Header，Key => Value
 
 $curlObj = $curlSet->exec();
