@@ -6,10 +6,10 @@ customCurl
 ## 目录
 
 - [使用示例](#example)
--- [GET 方法](#example_1)
--- [POST 方法](#example_2)
--- [Cookie](#example_3)
--- [Header](#example_4)
+    - [GET 方法](#example_1)
+    - [POST 方法](#example_2)
+    - [Cookie](#example_3)
+    - [Header](#example_4)
 - [设置项](#setting)
 - [杂项](#other)
 
