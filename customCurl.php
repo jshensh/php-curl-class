@@ -157,8 +157,8 @@ class CustomCurl
             }
             return $this;
         }
+        $this->reRequest--;
         if ($this->reRequest) {
-            $this->reRequest--;
             return $this->exec();
         }
         return false;
