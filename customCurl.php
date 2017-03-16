@@ -158,7 +158,7 @@ class CustomCurl
             return $this;
         }
         $this->reRequest--;
-        if ($this->reRequest) {
+        if ($this->reRequest > 0) {
             return $this->exec();
         }
         return false;
