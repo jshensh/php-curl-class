@@ -74,7 +74,7 @@ class CustomCurl
         return $this;
     }
 
-    public function clearHeader()
+    public function clearHeaders()
     {
         $this->customHeader = [];
         return $this;
@@ -86,7 +86,7 @@ class CustomCurl
         return $this;
     }
 
-    public function clearCookie()
+    public function clearCookies()
     {
         $this->sendCookies = [];
         return $this;
