@@ -5,18 +5,18 @@ customCurl
 
 ## 目录
 
-- [使用示例](#example)
-    - [GET 方法](#example_1)
-    - [POST 方法](#example_2)
-    - [Cookie](#example_3)
-    - [Header](#example_4)
-- [设置项](#setting)
-- [杂项](#other)
+- [使用示例](#使用示例)
+    - [GET 方法](#get-方法)
+    - [POST 方法](#post-方法)
+    - [Cookie](#cookie)
+    - [Header](#header)
+- [设置项](#设置项)
+- [杂项](#杂项)
 
 
-## <span id="example">使用示例</span>
+## 使用示例
 
-### <span id="example_1">GET 方法</span>
+### GET 方法
 
 ```php
 $curlSet = CustomCurl::init('http://cn.bing.com/search?q=php');
@@ -29,7 +29,7 @@ if ($curlObj) {
 }
 ```
 
-### <span id="example_2">POST 方法</span>
+### POST 方法
 
 ```php
 $curlSet = CustomCurl::init('http://www.w3school.com.cn/example/php/demo_php_global_post.php', 'post')
@@ -43,7 +43,7 @@ if ($curlObj) {
 }
 ```
 
-### <span id="example_3">Cookie</span>
+### Cookie
 
 ```php
 $curlSet = CustomCurl::init('http://example.com')
@@ -59,7 +59,7 @@ if ($curlObj) {
 }
 ```
 
-### <span id="example_4">Header</span>
+### Header
 
 ```php
 $curlSet = CustomCurl::init('http://example.com/api')
@@ -75,7 +75,7 @@ if ($curlObj) {
 }
 ```
 
-## <span id="setting">设置项</span>
+## 设置项
 
 ```php
 $curlSet = CustomCurl::init('http://cn.bing.com')
@@ -97,9 +97,9 @@ if ($curlObj) {
 }
 ```
 
-## <span id="other">杂项</span>
+## 杂项
 
-### <span id="other_1">多次请求同一地址</span>
+### 多次请求同一地址
 
 ```php
 $curlSet1 = CustomCurl::init('http://cn.bing.com')
