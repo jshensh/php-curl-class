@@ -105,7 +105,7 @@ if ($curlObj) {
 $curlSet1 = CustomCurl::init('http://cn.bing.com')
                 ->set('referer', 'http://google.com');
 
-$curlSet2 = clone $curlSet2;
+$curlSet2 = clone $curlSet1;
 
 $curlSet1 = $curlSet1->setHeader('X-PJAX', 'true');
 $curlSet2 = $curlSet2->setHeader('X-Requested-With', 'XMLHttpRequest');
