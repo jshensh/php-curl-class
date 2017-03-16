@@ -81,13 +81,13 @@ if ($curlObj) {
 $curlSet = CustomCurl::init('http://cn.bing.com')
             ->set('referer', 'http://google.com')           // 设置 HTTP REFERER
             ->set('ignoreCurlError', 1)                     // 忽略 Curl 错误，默认值 False
-            ->set('timeout', 1)                             // 设置 Curl Timeout，单位秒，默认值 5
+            ->set('timeout', 1)                             // CURLOPT_TIMEOUT，单位秒，默认值 5
             ->set('reRequest', 1)                           // 遇到错误时重新尝试的次数，默认值 3
             ->set('postFields', ['fname' => 'jshensh'])     // POST 提交参数，数组
             ->set('followLocation', 1)                      // CURLOPT_FOLLOWLOCATION，默认值 True
             ->set('autoRefer', 1)                           // CURLOPT_AUTOREFERER，默认值 True
             ->set('maxRedirs', 1)                           // CURLOPT_MAXREDIRS，默认值 3
-            ->set('userAgent', 1);                          // CURLOPT_USERAGENT
+            ->set('userAgent', 'Mozilla');                  // CURLOPT_USERAGENT
 
 $curlObj = $curlSet->exec();
 if ($curlObj) {
