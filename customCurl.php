@@ -180,18 +180,3 @@ class CustomCurl
         return $this->responseCookies;
     }
 }
-
-$curlSet = CustomCurl::init('https://www.baidu.com')
-            // ->set('postFields', ['a' => 'a', 'array' => ['key' => 'value']])
-            ->set('referer', 'http://lab.imjs.work/server.php')
-            ->set('ignoreCurlError', 1)
-            ->set('timeout', 1)
-            ->setHeader('X-Requested-With', 'XMLHttpRequest')
-            ->setCookies('a', 'b');
-
-$curlObj = $curlSet->exec();
-if ($curlObj) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
-} else {
-    var_dump($curlSet->getCurlErrNo());
-}
