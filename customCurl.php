@@ -18,7 +18,8 @@ class CustomCurl
             $body = '',
             $header = '',
             $responseCookies = [],
-            $curlErrNo = 0;
+            $curlErrNo = 0,
+            $autoRefer = 1;
 
     private function __construct($url, $method)
     {
@@ -52,6 +53,8 @@ class CustomCurl
             case 'ignoreCurlError':
                 // no break
             case 'followLocation':
+                // no break
+            case 'autoRefer':
                 $v = (bool)$v;
                 break;
             case 'referer':
@@ -125,6 +128,7 @@ class CustomCurl
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $this->followLocation);
         curl_setopt($ch, CURLOPT_MAXREDIRS, $this->maxRedirs);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, $this->autoRefer);
         if (count($this->sendCookies)) {
             $sendCookies = "";
             foreach ($this->sendCookies as $key => $value) {
