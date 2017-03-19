@@ -19,66 +19,65 @@ Custom Curl (嗯懒得取名字)
 ### GET 方法
 
 ```php
-$curlSet = CustomCurl::init('http://cn.bing.com/search?q=php');
+$curlObj = CustomCurl::init('http://cn.bing.com/search?q=php')->exec();
 
-$curlObj = $curlSet->exec();
-if ($curlObj) {
+if ($curlObj->getStatus()) {
     var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
 } else {
-    var_dump($curlSet->getCurlErrNo());
+    var_dump($curlObj->getCurlErrNo());
 }
 ```
 
 ### POST 方法
 
 ```php
-$curlSet = CustomCurl::init('http://www.w3school.com.cn/example/php/demo_php_global_post.php', 'post')
-            ->set('postFields', ['fname' => 'jshensh']);
+$curlObj = CustomCurl::init('http://www.w3school.com.cn/example/php/demo_php_global_post.php', 'post')
+            ->set('postFields', ['fname' => 'jshensh'])
+            ->exec();
 
-$curlObj = $curlSet->exec();
-if ($curlObj) {
+if ($curlObj->getStatus()) {
     var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
 } else {
-    var_dump($curlSet->getCurlErrNo());
+    var_dump($curlObj->getCurlErrNo());
 }
 ```
 
 ### Cookie
 
 ```php
-$curlSet = CustomCurl::init('http://example.com')
+$curlObj = CustomCurl::init('http://example.com')
             ->setCookie('a', 'b')     // 设置 Cookie，Key => Value
             ->clearCookies()          // 清空之前设置的所有 Cookie
-            ->setCookie('b', 'c');    // 重新设置 Cookie，Key => Value
+            ->setCookie('b', 'c')     // 重新设置 Cookie，Key => Value
+            ->exec();
 
-$curlObj = $curlSet->exec();
-if ($curlObj) {
+if ($curlObj->getStatus()) {
     var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
 } else {
-    var_dump($curlSet->getCurlErrNo());
+    var_dump($curlObj->getCurlErrNo());
 }
 ```
 
 ### Header
 
 ```php
-$curlSet = CustomCurl::init('http://example.com/api')
+$curlObj = CustomCurl::init('http://example.com/api')
             ->setHeader('X-PJAX', 'true')                         // 设置 Header，Key => Value
             ->clearHeaders()                                      // 清空之前设置的所有 Header
-            ->setHeader('X-Requested-With', 'XMLHttpRequest');    // 设置 Header，Key => Value
+            ->setHeader('X-Requested-With', 'XMLHttpRequest')     // 设置 Header，Key => Value
+            ->exec();
 
-$curlObj = $curlSet->exec();
-if ($curlObj) {
+if ($curlObj->getStatus()) {
     var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
 } else {
-    var_dump($curlSet->getCurlErrNo());
+    var_dump($curlObj->getCurlErrNo());
 }
 ```
 
 ## 设置项
 
 ```php
-$curlSet = CustomCurl::init('http://cn.bing.com')
+$curlObj = CustomCurl::init('http://cn.bing.com')
             ->set('referer', 'http://google.com')           // 设置 HTTP REFERER
             ->set('ignoreCurlError', 1)                     // 忽略 Curl 错误，默认值 False
             ->set('timeout', 1)                             // CURLOPT_TIMEOUT，单位秒，默认值 5
@@ -87,13 +86,13 @@ $curlSet = CustomCurl::init('http://cn.bing.com')
             ->set('followLocation', 1)                      // CURLOPT_FOLLOWLOCATION，默认值 True
             ->set('autoRefer', 1)                           // CURLOPT_AUTOREFERER，默认值 True
             ->set('maxRedirs', 1)                           // CURLOPT_MAXREDIRS，默认值 3
-            ->set('userAgent', 'Mozilla');                  // CURLOPT_USERAGENT
+            ->set('userAgent', 'Mozilla')                   // CURLOPT_USERAGENT
+            ->exec();
 
-$curlObj = $curlSet->exec();
-if ($curlObj) {
+if ($curlObj->getStatus()) {
     var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
 } else {
-    var_dump($curlSet->getCurlErrNo());
+    var_dump($curlObj->getCurlErrNo());
 }
 ```
 
@@ -102,25 +101,23 @@ if ($curlObj) {
 ### 多次请求同一地址
 
 ```php
-$curlSet1 = CustomCurl::init('http://cn.bing.com')
+$curlObj1 = CustomCurl::init('http://cn.bing.com')
                 ->set('referer', 'http://google.com');
 
-$curlSet2 = clone $curlSet1;
+$curlObj2 = clone $curlObj1;
 
-$curlSet1 = $curlSet1->setHeader('X-PJAX', 'true');
-$curlSet2 = $curlSet2->setHeader('X-Requested-With', 'XMLHttpRequest');
+$curlObj1 = $curlObj1->setHeader('X-PJAX', 'true')->exec();
+$curlObj2 = $curlObj2->setHeader('X-Requested-With', 'XMLHttpRequest')->exec();
 
-$curlObj1 = $curlSet1->exec();
-if ($curlObj1) {
+if ($curlObj1->getStatus()) {
     var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody());
 } else {
-    var_dump($curlSet1->getCurlErrNo());
+    var_dump($curlObj1->getCurlErrNo());
 }
 
-$curlObj2 = $curlSet2->exec();
-if ($curlObj2) {
+if ($curlObj2->getStatus()) {
     var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody());
 } else {
-    var_dump($curlSet2->getCurlErrNo());
+    var_dump($curlObj2->getCurlErrNo());
 }
 ```
