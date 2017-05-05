@@ -151,6 +151,42 @@ class CustomCurl
         return $this;
     }
 
+    private function parseCookie($cookie) 
+    {
+        $op = [];
+        $pieces = array_filter(array_map('trim', explode(';', $cookie)));
+        if (empty($pieces) || !strpos($pieces[0], '=')) {
+            return [];
+        }
+        foreach ($pieces as $part) {
+            $cookieParts = explode('=', $part, 2);
+            $key = trim($cookieParts[0]);
+            $value = isset($cookieParts[1])
+                ? trim($cookieParts[1], " \n\r\t\0\x0B")
+                : true;
+            $op[$key] = $value;
+        }
+        return $op;
+    }
+
+    public function setCookies($parm, $append = false)
+    {
+        $cookies = is_array($parm) ? $parm : $this->parseCookie($parm);
+        $cookiesC = count($cookies);
+
+        if (!$cookiesC || ($cookiesC !== count($cookies, 1))) {
+            return $this;
+        }
+
+        if ($append) {
+            $this->sendCookies = array_merge($this->sendCookies, $cookies);
+        } else {
+            $this->sendCookies = $cookies;
+        }
+
+        return $this;
+    }
+
     public function clearCookies()
     {
         $this->sendCookies = [];
