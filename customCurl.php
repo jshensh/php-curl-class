@@ -1,4 +1,18 @@
 <?php
+// +----------------------------------------------------------------------
+// | Custom Curl
+// +----------------------------------------------------------------------
+// | Copyright (c) 2017~2017 http://233.imjs.work All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: jshensh <jshensh@126.com>
+// +----------------------------------------------------------------------
+
+/**
+ * Custom Curl 结果类
+ * @author  jshensh <jshensh@126.com>
+ */
 class CustomCurlStatement
 {
     private $ch = null,
@@ -9,6 +23,12 @@ class CustomCurlStatement
             $curlErrNo = 0,
             $status = false;
 
+    /**
+     * 解析 Cookie
+     * @access private
+     * @param string $cookie Cookies 字符串
+     * @return array
+     */
     private function parseCookie($cookie) 
     {
         $op = [];
@@ -27,6 +47,14 @@ class CustomCurlStatement
         return $op;
     }
 
+    /**
+     * 构造方法
+     * @access public
+     * @param integer  $curlErrNo Curl 错误码
+     * @param resource $ch Curl 句柄
+     * @param string   $output 请求结果
+     * @return void
+     */
     public function __construct($curlErrNo, $ch, $output) {
         if ($curlErrNo !== 0) {
             $this->curlErrNo = $curlErrNo;
@@ -44,32 +72,61 @@ class CustomCurlStatement
         }
     }
 
+    /**
+     * 获取请求结果状态
+     * @access public
+     * @return bool
+     */
     public function getStatus()
     {
         return $this->status;
     }
 
+    /**
+     * 获取请求结果的 body 部分
+     * @access public
+     * @return string
+     */
     public function getBody()
     {
         return $this->body;
     }
 
+    /**
+     * 获取请求结果的 Header 部分
+     * @access public
+     * @return string
+     */
     public function getHeader()
     {
         return $this->header;
     }
 
+    /**
+     * 获取 Curl 错误码
+     * @access public
+     * @return integer
+     */
     public function getCurlErrNo()
     {
         return $this->curlErrNo;
     }
 
+    /**
+     * 获取请求结果的 Cookies 数组
+     * @access public
+     * @return array
+     */
     public function getCookies()
     {
         return $this->responseCookies;
     }
 }
 
+/**
+ * Custom Curl 类
+ * @author  jshensh <jshensh@126.com>
+ */
 class CustomCurl
 {
     private $url = '',
@@ -86,6 +143,13 @@ class CustomCurl
             $sendCookies = [],
             $autoRefer = 1;
 
+    /**
+     * 构造方法
+     * @access private
+     * @param string $url URL 字符串
+     * @param string $method 请求方法，post 或者 get
+     * @return void
+     */
     private function __construct($url, $method)
     {
         $this->url = $url;
@@ -93,11 +157,25 @@ class CustomCurl
         $this->method = $method === 'get' ? 'get' : 'post';
     }
 
+    /**
+     * 初始化
+     * @access public
+     * @param string $url URL 字符串
+     * @param string $method 请求方法，post 或者 get
+     * @return CustomCurl
+     */
     public static function init($url, $method = 'get')
     {
         return new self($url, $method);
     }
 
+    /**
+     * 设置项
+     * @access public
+     * @param string $k 设置项 Key
+     * @param string $v 设置项 Value
+     * @return CustomCurl
+     */
     public function set($k, $v)
     {
         switch ($k) {
@@ -133,24 +211,49 @@ class CustomCurl
         return $this;
     }
 
+    /**
+     * 设置 Header
+     * @access public
+     * @param string $k Header Key
+     * @param string $v Header Value
+     * @return CustomCurl
+     */
     public function setHeader($k, $v)
     {
         $this->customHeader[] = "{$k}: {$v}";
         return $this;
     }
 
+    /**
+     * 清空设置的 Header
+     * @access public
+     * @return CustomCurl
+     */
     public function clearHeaders()
     {
         $this->customHeader = [];
         return $this;
     }
 
+    /**
+     * 设置 Cookie
+     * @access public
+     * @param string $k Cookie Key
+     * @param string $v Cookie Value
+     * @return CustomCurl
+     */
     public function setCookie($k, $v)
     {
         $this->sendCookies[$k] = $v;
         return $this;
     }
 
+    /**
+     * 解析 Cookie
+     * @access private
+     * @param string $cookie Cookies 字符串
+     * @return array
+     */
     private function parseCookie($cookie) 
     {
         $op = [];
@@ -169,6 +272,13 @@ class CustomCurl
         return $op;
     }
 
+    /**
+     * 设置 Cookies
+     * @access public
+     * @param string|array  $parm Cookies 字符串或一维数组
+     * @param bool          $append 是否追加设置
+     * @return CustomCurl
+     */
     public function setCookies($parm, $append = false)
     {
         $cookies = is_array($parm) ? $parm : $this->parseCookie($parm);
@@ -187,12 +297,22 @@ class CustomCurl
         return $this;
     }
 
+    /**
+     * 清空 Cookies
+     * @access public
+     * @return CustomCurl
+     */
     public function clearCookies()
     {
         $this->sendCookies = [];
         return $this;
     }
 
+    /**
+     * 执行 Curl
+     * @access public
+     * @return CustomCurlStatement
+     */
     public function exec()
     {
         $ch = curl_init();
