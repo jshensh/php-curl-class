@@ -140,3 +140,10 @@ if ($curlObj2->getStatus()) {
     var_dump($curlObj2->getCurlErrNo());
 }
 ```
+
+## 版权信息
+
+Custom Curl 遵循 Apache2 开源协议发布，并提供免费使用。
+版权所有Copyright © 2017-2017 by jshensh (http://233.imjs.work)
+All rights reserved。
+更多细节参阅 [LICENSE.txt](LICENSE.txt)
