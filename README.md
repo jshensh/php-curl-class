@@ -145,7 +145,7 @@ if ($curlObj2->getStatus()) {
 
 Custom Curl 遵循 Apache2 开源协议发布，并提供免费使用。
 
-版权所有Copyright © 2017-2017 by jshensh (http://233.imjs.work)
+版权所有Copyright © 2017 by jshensh (http://233.imjs.work)
 
 All rights reserved。
 

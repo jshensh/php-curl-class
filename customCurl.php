@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | Custom Curl
 // +----------------------------------------------------------------------
-// | Copyright (c) 2017~2017 http://233.imjs.work All rights reserved.
+// | Copyright (c) 2017 http://233.imjs.work All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -50,7 +50,7 @@ class CustomCurlStatement
     /**
      * 构造方法
      * @access public
-     * @param integer  $curlErrNo Curl 错误码
+     * @param int      $curlErrNo Curl 错误码
      * @param resource $ch Curl 句柄
      * @param string   $output 请求结果
      * @return void
@@ -105,7 +105,7 @@ class CustomCurlStatement
     /**
      * 获取 Curl 错误码
      * @access public
-     * @return integer
+     * @return int
      */
     public function getCurlErrNo()
     {
