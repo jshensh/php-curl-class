@@ -132,7 +132,7 @@ class CustomCurlStatement
      */
     public function getInfo($key = '')
     {
-        return $key ? (isset($this->curlInfo[$key]) ? $this->curlInfo[$key] : $this->curlInfo) : $this->curlInfo;
+        return $key ? (isset($this->curlInfo[$key]) ? $this->curlInfo[$key] : false) : $this->curlInfo;
     }
 }
 
