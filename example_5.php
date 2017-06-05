@@ -8,7 +8,7 @@ $curlObj = CustomCurl::init('http://lab.imjs.work/server.php')
             ->exec();
 
 if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj->getCurlErrNo());
 }

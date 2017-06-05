@@ -22,7 +22,7 @@ Custom Curl (嗯懒得取名字)
 $curlObj = CustomCurl::init('http://cn.bing.com/search?q=php')->exec();
 
 if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj->getCurlErrNo());
 }
@@ -36,7 +36,7 @@ $curlObj = CustomCurl::init('http://www.w3school.com.cn/example/php/demo_php_glo
             ->exec();
 
 if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj->getCurlErrNo());
 }
@@ -52,7 +52,7 @@ $curlObj = CustomCurl::init('http://example.com')
             ->exec();
 
 if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj->getCurlErrNo());
 }
@@ -71,7 +71,7 @@ $curlObj = CustomCurl::init('http://example.com')
             ->exec();
 
 if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj->getCurlErrNo());
 }
@@ -87,7 +87,7 @@ $curlObj = CustomCurl::init('http://example.com/api')
             ->exec();
 
 if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj->getCurlErrNo());
 }
@@ -109,7 +109,7 @@ $curlObj = CustomCurl::init('http://cn.bing.com')
             ->exec();
 
 if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody());
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj->getCurlErrNo());
 }
@@ -129,13 +129,13 @@ $curlObj1 = $curlObj1->setHeader('X-PJAX', 'true')->exec();
 $curlObj2 = $curlObj2->setHeader('X-Requested-With', 'XMLHttpRequest')->exec();
 
 if ($curlObj1->getStatus()) {
-    var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody());
+    var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj1->getCurlErrNo());
 }
 
 if ($curlObj2->getStatus()) {
-    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody());
+    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj->getInfo());
 } else {
     var_dump($curlObj2->getCurlErrNo());
 }

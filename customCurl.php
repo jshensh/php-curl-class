@@ -20,6 +20,7 @@ class CustomCurlStatement
             $body = '',
             $header = '',
             $responseCookies = [],
+            $curlInfo = [],
             $curlErrNo = 0,
             $status = false;
 
@@ -61,7 +62,8 @@ class CustomCurlStatement
             return;
         }
         $this->status = true;
-        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $this->curlInfo = curl_getinfo($ch);
+        $headerSize = $this->curlInfo['header_size'];
         $this->header = substr($output, 0, $headerSize);
         $this->body = substr($output, $headerSize);
         preg_match_all('/Set-Cookie:(.*?)(\r\n|$)/is', $this->header, $responseCookiesArr);
@@ -120,6 +122,17 @@ class CustomCurlStatement
     public function getCookies()
     {
         return $this->responseCookies;
+    }
+
+    /**
+     * 获取请求结果的 Info
+     * @access public
+     * @param string $key Curl Info Key
+     * @return mixed
+     */
+    public function getInfo($key = '')
+    {
+        return $key ? (isset($this->curlInfo[$key]) ? $this->curlInfo[$key] : $this->curlInfo) : $this->curlInfo;
     }
 }
 
