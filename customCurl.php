@@ -160,14 +160,14 @@ class CustomCurl
      * 构造方法
      * @access private
      * @param string $url URL 字符串
-     * @param string $method 请求方法，post 或者 get
+     * @param string $method 请求方法，[get, post, put, delete]
      * @return void
      */
     private function __construct($url, $method)
     {
         $this->url = $url;
         $method = strtolower($method);
-        $this->method = $method === 'get' ? 'get' : 'post';
+        $this->method = in_array($method, ['get', 'post', 'put', 'delete']) ? $method : 'get';
     }
 
     /**
