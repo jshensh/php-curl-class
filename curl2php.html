@@ -134,7 +134,6 @@
                     switch (tmp[2]) {
                         case 'H':
                             var header = (tmp[4] || tmp[3]).match(/^(.*?): (.*?)$/);
-                            console.log(tmp, header);
                             switch (header[1]) {
                                 case 'Pragma':
                                 case 'Origin':
