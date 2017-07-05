@@ -128,32 +128,34 @@
                 url = '',
                 op = "$curlObj = CustomCurl::init('__url__'__isPost__)\n";
             
-            for (var i = 0; i < arguments.length; i++) {
-                var tmp = arguments[i].match(/(\-)+(.*?) \'(.*)\'$/);
-                switch (tmp[2]) {
-                    case 'H':
-                        var header = tmp[3].match(/^(.*?): (.*?)$/);
-                        switch (header[1]) {
-                            case 'Pragma':
-                            case 'Origin':
-                            case 'Accept-Encoding':
-                            case 'Accept-Language':
-                            case 'Upgrade-Insecure-Requests':
-                            case 'Content-Type':
-                            case 'Accept':
-                            case 'Cache-Control':
-                            case 'Connection':
-                                break;
-                            default:
-                                headers[header[1]] = header[2];
-                        }
-                        break;
-                    case 'data':
-                        postFields = parse_str(tmp[3]);
-                        break;
+            if (arguments) {
+                for (var i = 0; i < arguments.length; i++) {
+                    var tmp = arguments[i].match(/(\-)+(.*?) \'(.*)\'$/);
+                    switch (tmp[2]) {
+                        case 'H':
+                            var header = tmp[3].match(/^(.*?): (.*?)$/);
+                            switch (header[1]) {
+                                case 'Pragma':
+                                case 'Origin':
+                                case 'Accept-Encoding':
+                                case 'Accept-Language':
+                                case 'Upgrade-Insecure-Requests':
+                                case 'Content-Type':
+                                case 'Accept':
+                                case 'Cache-Control':
+                                case 'Connection':
+                                    break;
+                                default:
+                                    headers[header[1]] = header[2];
+                            }
+                            break;
+                        case 'data':
+                            postFields = parse_str(tmp[3]);
+                            break;
+                    }
+                    bash = bash.replace(arguments[i], '');
                 }
-                bash = bash.replace(arguments[i], '');
-            };
+            }
             var urlTmp = bash.match(/\'(http.*?)\'/);
             url = urlTmp[1];
 
