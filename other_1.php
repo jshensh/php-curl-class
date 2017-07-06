@@ -16,7 +16,7 @@ if ($curlObj1->getStatus()) {
 }
 
 if ($curlObj2->getStatus()) {
-    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj->getInfo());
+    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
 } else {
     var_dump($curlObj2->getCurlErrNo());
 }
