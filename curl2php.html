@@ -125,7 +125,7 @@
         };
 
         var rightPad = function(str, len) {
-            return str + (new Array(~~len - str.length + 1).join(' '));
+            return str.length >= ~~len ? str : str + (new Array(~~len - str.length + 1).join(' '));
         };
 
         var convertCurl = function() {
@@ -192,14 +192,17 @@
             }
 
             var getPHPArray = function(f) {
-                var opS = '', tabs = arguments[1] || '                ';
+                var opS = '', tabs = arguments[1] || '                ', maxLength = 0;
+                for (var i in f) {
+                    maxLength = i.length > maxLength ? i.length : maxLength;
+                };
                 for (var i in f) {
                     if (typeof f[i] === 'object') {
-                        opS += tabs + "'" + i + "' => [\n";
+                        opS += tabs + rightPad("'" + i + "'", maxLength + 2) + " => [\n";
                         opS += getPHPArray(f[i], tabs + '    ');
                         opS += tabs + "],\n";
                     } else {
-                        opS += tabs + "'" + i + "' => '" + f[i] + "',\n";
+                        opS += tabs + rightPad("'" + i + "'", maxLength + 2) + " => '" + f[i] + "',\n";
                     }
                 }
                 return opS;
