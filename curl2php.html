@@ -139,6 +139,7 @@
             if (arguments) {
                 for (var i = 0; i < arguments.length; i++) {
                     var tmp = arguments[i].match(/(\-)+(.*?) (\'(.*)\'$|[^ ]*)/);
+                    console.log(tmp);
                     switch (tmp[2]) {
                         case 'H':
                             var header = (tmp[4] || tmp[3]).match(/^(.*?): (.*?)$/);
@@ -148,20 +149,32 @@
                                 case 'Accept-Encoding':
                                 case 'Accept-Language':
                                 case 'Upgrade-Insecure-Requests':
-                                case 'Content-Type':
                                 case 'Accept':
                                 case 'Cache-Control':
                                 case 'Connection':
                                     break;
+                                case 'Content-Type':
+                                    if (header[2].indexOf("form") > -1) {
+                                        break;
+                                    }
+                                    if (header[2].indexOf("json") > -1) {
+                                        op += "            ->set('postType', 'json')\n";
+                                        break;
+                                    }
                                 default:
                                     headers[header[1]] = header[2];
                             }
                             break;
+                        case 'd':
                         case 'data':
                             postFields = parse_str(tmp[4] || tmp[3]);
                             break;
                         case 'X':
                             op = op.replace('__isPost__', ", '" + (tmp[4] || tmp[3]).toLowerCase() + "'");
+                            break;
+                        case 'data-binary':
+                            postFields = tmp[4] || tmp[3];
+                            break;
                     }
                     bash = bash.replace(arguments[i], '');
                 }
@@ -187,32 +200,36 @@
                 }
             }
 
-            if (JSON.stringify(postFields) !== '{}') {
-                op += "            ->set('postFields', [\n";
-            }
-
-            var getPHPArray = function(f) {
-                var opS = '', tabs = arguments[1] || '                ', maxLength = 0;
-                for (var i in f) {
-                    maxLength = i.length > maxLength ? i.length : maxLength;
-                };
-                for (var i in f) {
-                    if (typeof f[i] === 'object') {
-                        opS += tabs + rightPad("'" + i + "'", maxLength + 2) + " => [\n";
-                        opS += getPHPArray(f[i], tabs + '    ');
-                        opS += tabs + "],\n";
-                    } else {
-                        opS += tabs + rightPad("'" + i + "'", maxLength + 2) + " => '" + f[i] + "',\n";
-                    }
+            if (typeof postFields !== 'string') {
+                if (JSON.stringify(postFields) !== '{}') {
+                    op += "            ->set('postFields', [\n";
                 }
-                return opS;
-            };
 
-            op += getPHPArray(postFields);
+                var getPHPArray = function(f) {
+                    var opS = '', tabs = arguments[1] || '                ', maxLength = 0;
+                    for (var i in f) {
+                        maxLength = i.length > maxLength ? i.length : maxLength;
+                    };
+                    for (var i in f) {
+                        if (typeof f[i] === 'object') {
+                            opS += tabs + rightPad("'" + i + "'", maxLength + 2) + " => [\n";
+                            opS += getPHPArray(f[i], tabs + '    ');
+                            opS += tabs + "],\n";
+                        } else {
+                            opS += tabs + rightPad("'" + i + "'", maxLength + 2) + " => '" + f[i] + "',\n";
+                        }
+                    }
+                    return opS;
+                };
 
-            if (JSON.stringify(postFields) !== '{}') {
-                op = op.replace(/,\n( +)\]/g, "\n$1]").replace(/,\n$/, "\n");
-                op += "            ])\n";
+                op += getPHPArray(postFields);
+
+                if (JSON.stringify(postFields) !== '{}') {
+                    op = op.replace(/,\n( +)\]/g, "\n$1]").replace(/,\n$/, "\n");
+                    op += "            ])\n";
+                }
+            } else {
+                op += "            ->set('postFields', '" + postFields + "')\n";
             }
 
             document.getElementById('php').innerHTML = op + "            ->exec();\n\nif ($curlObj->getStatus()) {\n    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());\n} else {\n    var_dump($curlObj->getCurlErrNo());\n}";
