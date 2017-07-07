@@ -154,7 +154,8 @@ class CustomCurl
             $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
             $customHeader = [],
             $sendCookies = [],
-            $autoRefer = 1;
+            $autoRefer = 1,
+            $postType = 'form';
 
     /**
      * 构造方法
@@ -202,7 +203,13 @@ class CustomCurl
                 }
                 break;
             case 'postFields':
-                if ($this->method !== "post" || !is_array($v)) {
+                if (!in_array($this->method, ['post', 'put'])) {
+                    return $this;
+                }
+                break;
+            case 'postType':
+                $v = strtolower($v);
+                if (!in_array($v, ['string', 'form', 'json'])) {
                     return $this;
                 }
                 break;
@@ -335,22 +342,37 @@ class CustomCurl
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_REFERER, $this->referer);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->customHeader);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $this->followLocation);
         curl_setopt($ch, CURLOPT_MAXREDIRS, $this->maxRedirs);
         curl_setopt($ch, CURLOPT_AUTOREFERER, $this->autoRefer);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($this->method));
         if (count($this->sendCookies)) {
-            $sendCookies = "";
+            $sendCookies = '';
             foreach ($this->sendCookies as $key => $value) {
                 $sendCookies .= "{$key}={$value}; ";
             }
             curl_setopt($ch, CURLOPT_COOKIE, $sendCookies);
         }
-        if ($this->method === 'post') {
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($this->postFields));
+        if (in_array($this->method, ['post', 'put'])) {
+            if ($this->postType === 'json') {
+                $postJsonData = json_encode($this->postFields);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $postJsonData);
+                $this->customHeader[] = 'Content-Type: application/json';
+                $this->customHeader[] = 'Content-Length: ' . strlen($postJsonData);
+            } else if ($this->postType === 'form') {
+                if (is_array($this->postFields)) {
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($this->postFields));
+                }
+            } else {
+                if (is_string($this->postFields)) {
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postFields);
+                    $this->customHeader[] = 'Content-Type: text/plain';
+                    $this->customHeader[] = 'Content-Length: ' . strlen($this->postFields);
+                }
+            }
         }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->customHeader);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_NOBODY, false);
         $output = curl_exec($ch);
