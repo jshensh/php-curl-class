@@ -117,7 +117,7 @@ $curlObj = CustomCurl::init('http://cn.bing.com')
             ->set('timeout', 1)                             // CURLOPT_TIMEOUT，单位秒，默认值 5
             ->set('reRequest', 1)                           // 遇到错误时重新尝试的次数，默认值 3
             ->set('postFields', ['fname' => 'jshensh'])     // POST 提交参数，数组
-            ->set('postType', 'json')                       // 提交方式，可选 ['form', 'json', 'string']
+            ->set('postType', 'json')                       // 提交方式，可选 ['form', 'json', 'string']，默认值 Form
             ->set('followLocation', 1)                      // CURLOPT_FOLLOWLOCATION，默认值 True
             ->set('autoRefer', 1)                           // CURLOPT_AUTOREFERER，默认值 True
             ->set('maxRedirs', 1)                           // CURLOPT_MAXREDIRS，默认值 3
