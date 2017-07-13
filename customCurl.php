@@ -155,7 +155,11 @@ class CustomCurl
             $customHeader = [],
             $sendCookies = [],
             $autoRefer = 1,
-            $postType = 'form';
+            $postType = 'form',
+            $proxy = false,
+            $proxyPort = 8080,
+            $proxyUserPwd = '',
+            $proxyType = CURLPROXY_HTTP;
 
     /**
      * 构造方法
@@ -221,6 +225,14 @@ class CustomCurl
                 $v = (bool)$v;
                 break;
             case 'referer':
+                // no break
+            case 'proxy':
+                // no break
+            case 'proxyPort':
+                // no break
+            case 'proxyUserPwd':
+                // no break
+            case 'proxyType':
                 // no break
             case 'userAgent':
                 break;
@@ -373,6 +385,14 @@ class CustomCurl
             }
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $this->customHeader);
+        if ($this->proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
+            if ($this->proxyUserPwd) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUserPwd);
+            }
+            curl_setopt($ch, CURLOPT_PROXYTYPE, $this->proxyType);
+        }
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_NOBODY, false);
         $output = curl_exec($ch);

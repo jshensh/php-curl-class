@@ -157,6 +157,23 @@ if ($curlObj2->getStatus()) {
 }
 ```
 
+### 代理
+
+```php
+$curlObj = CustomCurl::init('http://example.com')
+            ->set('proxy', '127.0.0.1')                     //代理地址
+            ->set('proxyPort', 8080)                        //代理端口，默认 8080
+            ->set('proxyUserPwd', '[username]:[password]')  //代理用户名密码，默认不设置
+            ->set('proxyType', CURLPROXY_HTTP)              //代理类型，可选 [CURLPROXY_HTTP, CURLPROXY_SOCKS4, CURLPROXY_SOCKS5, CURLPROXY_SOCKS4A, CURLPROXY_SOCKS5_HOSTNAME]，默认 CURLPROXY_HTTP，传入常量，不要加引号
+            ->exec();
+
+if ($curlObj->getStatus()) {
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+} else {
+    var_dump($curlObj->getCurlErrNo());
+}
+```
+
 ## 版权信息
 
 Custom Curl 遵循 Apache2 开源协议发布，并提供免费使用。
