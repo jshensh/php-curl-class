@@ -130,7 +130,7 @@
 
         var convertCurl = function() {
             var bash = document.getElementById('bash').value.replace(/^curl /, ''),
-                arguments = bash.match(/\-.*? (\'.*?\'|[^ ]*)/g),
+                arguments = bash.match(/\-.*? +(\'.*?\'|[^ ]*)/g),
                 headers = {},
                 postFields = {},
                 url = '',
@@ -138,7 +138,7 @@
             
             if (arguments) {
                 for (var i = 0; i < arguments.length; i++) {
-                    var tmp = arguments[i].match(/(\-)+(.*?) (\'(.*)\'$|[^ ]*)/);
+                    var tmp = arguments[i].match(/(\-)+(.*?) +(\'(.*)\'$|[^ ]*)/);
                     console.log(tmp);
                     switch (tmp[2]) {
                         case 'H':
@@ -167,7 +167,11 @@
                             break;
                         case 'd':
                         case 'data':
-                            postFields = parse_str(tmp[4] || tmp[3]);
+                        case 'data-urlencode':
+                            if (typeof postFields !== 'object') {
+                                break;
+                            }
+                            Object.assign(postFields, parse_str(tmp[4] || tmp[3]));
                             break;
                         case 'X':
                             op = op.replace('__isPost__', ", '" + (tmp[4] || tmp[3]).toLowerCase() + "'");
