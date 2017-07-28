@@ -139,12 +139,13 @@
 
             for (var i = 0; i < commandLine.length; i++) {
                 if (commandLine[i] === '\\' && !ignoreNextChar) {
-                    tmpArgument += commandLine[i];
                     ignoreNextChar = true;
                     continue;
                 }
                 if (ignoreNextChar) {
-                    tmpArgument += commandLine[i];
+                    if (commandLine[i] !== "\n") {
+                        tmpArgument += commandLine[i];
+                    }
                     ignoreNextChar = false;
                     continue;
                 }
@@ -179,6 +180,9 @@
                     if (stringIdentifier) {
                         tmpArgument += commandLine[i];
                     } else {
+                        if (!tmpArgument) {
+                            continue;
+                        }
                         commandArguments.push(tmpArgument);
                         tmpArgument = '';
                     }
