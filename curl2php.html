@@ -15,7 +15,7 @@
 
     <body>
         <div>
-            <p>Curl 命令 (Bash):</p>
+            <p>Curl 命令:</p>
             <div>
                 <textarea rows="5" style="width: 100%;" id="bash"></textarea>
             </div>
@@ -166,7 +166,7 @@
                     if (commandLine[i] === "\n" && !stringIdentifier) {
                         continue;
                     }
-                    if (commandLine[i] === ';' && !stringIdentifier) {
+                    if ([';', '&'].indexOf(commandLine[i]) > -1 && !stringIdentifier) {
                         commandArguments.push(tmpArgument);
                         commands.push(commandArguments);
                         tmpArgument = '';
