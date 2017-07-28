@@ -143,7 +143,7 @@
                     continue;
                 }
                 if (ignoreNextChar) {
-                    if (commandLine[i] !== "\n") {
+                    if (commandLine[i] !== "\n" || stringIdentifier) {
                         tmpArgument += commandLine[i];
                     }
                     ignoreNextChar = false;
@@ -199,7 +199,7 @@
             if (arguments[1] !== void 0) {
                 document.getElementById('php').innerHTML = '';
             }
-            document.getElementById('php').innerHTML += msg;
+            document.getElementById('php').innerHTML += msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             hljs.highlightBlock(document.getElementById('php'));
         };
 
@@ -497,24 +497,33 @@
                         headers['Referer'] = nextArg;
                         usedArg = true;
                         break;
+                    case 'F':
+                        var form = nextArg.match(/^(.*?)=(.*?)$/);
+                        if (form) {
+                            postFields[form[1]] = form[2];
+                        }
+                        usedArg = true;
+                        break;
                     case 'G':
                         method = 'get';
                         break;
                     case 'H':
                         var header = nextArg.match(/^(.*?): (.*?)$/);
-                        switch (header[1]) {
-                            case 'Content-Type':
-                                if (header[2].indexOf("json")) {
-                                    postJson = true;
-                                } else {
+                        if (header) {
+                            switch (header[1]) {
+                                case 'Content-Type':
+                                    if (header[2].indexOf("json")) {
+                                        postJson = true;
+                                    } else {
+                                        headers[header[1]] = header[2];
+                                    }
+                                    break;
+                                case 'Cookie':
+                                    cookies.push(header[2]);
+                                    break;
+                                default:
                                     headers[header[1]] = header[2];
-                                }
-                                break;
-                            case 'Cookie':
-                                cookies.push(header[2]);
-                                break;
-                            default:
-                                headers[header[1]] = header[2];
+                            }
                         }
                         usedArg = true;
                         break;
@@ -522,12 +531,16 @@
                         timeout = ~~nextArg;
                         usedArg = true;
                         break;
+                    case 'u':
+                        headers['Authorization'] = btoa(nextArg);
+                        usedArg = true;
+                        break;
                     case 'X':
                         method = nextArg;
                         usedArg = true;
                         break;
                     default:
-                        usedArg = Boolean(aliases[letter][1]);
+                        usedArg = aliases[letter][1] === 2;
                 }
 
                 return ~~usedArg;
