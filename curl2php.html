@@ -516,6 +516,12 @@
                 }
             }
 
+            if (!url) {
+                document.getElementById('php').innerHTML = '输入命令不合法';
+                hljs.highlightBlock(document.getElementById('php'));
+                return false;
+            }
+
             var op = "$curlObj = CustomCurl::init('__url__', '__method__')\n"
                         .replace('__url__', url)
                         .replace('__method__', method);
