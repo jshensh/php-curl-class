@@ -438,11 +438,11 @@
             renderToCodeDom('', true);
             var commands = parseCommand(document.getElementById('bash').value);
             for (var i = 0; i < commands.length; i++) {
-                doConvertCurl(commands[i]);
+                doConvertCurl(commands[i], i);
             }
         };
 
-        var doConvertCurl = function(arguments) {
+        var doConvertCurl = function(arguments, requestI) {
             if (arguments[0] !== 'curl') {
                 console.log(arguments);
                 renderToCodeDom("//输入命令不合法\n\n");
@@ -582,7 +582,7 @@
                 return false;
             }
 
-            var op = "$curlObj = CustomCurl::init('__url__', '__method__')\n"
+            var op = "$curlObj" + requestI + " = CustomCurl::init('__url__', '__method__')\n"
                         .replace('__url__', url)
                         .replace('__method__', method);
 
@@ -654,7 +654,7 @@
                 op += "            ->set('postFields', \"" + postFields.replace(/"/g, '\\"') + "\")\n";
             }
 
-            renderToCodeDom(op + "            ->exec();\n\nif ($curlObj->getStatus()) {\n    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());\n} else {\n    var_dump($curlObj->getCurlErrNo());\n}\n\n");
+            renderToCodeDom(op + "            ->exec();\n\nif ($curlObj" + requestI + "->getStatus()) {\n    var_dump($curlObj" + requestI + "->getHeader(), $curlObj" + requestI + "->getCookies(), $curlObj" + requestI + "->getBody(), $curlObj" + requestI + "->getInfo());\n} else {\n    var_dump($curlObj" + requestI + "->getCurlErrNo());\n}\n\n");
         };
     </script>
 </html>
