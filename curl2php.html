@@ -536,9 +536,6 @@
                     case 'Referer':
                         op += "            ->set('referer', '" + headers[i] + "')\n";
                         break;
-                    case 'Cookie':
-                        op += "            ->setCookies('" + headers[i] + "')\n";
-                        break;
                     default:
                         op += "            ->setHeader('" + i + "', '" + headers[i] + "')\n";
                 }
