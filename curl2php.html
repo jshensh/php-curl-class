@@ -131,7 +131,8 @@
         var parseCommand = function(commandLine) {
             commandLine = commandLine.trim();
 
-            var commandArguments = [],
+            var commands = [],
+                commandArguments = [],
                 stringIdentifier = '',
                 tmpArgument = '',
                 ignoreNextChar = false;
@@ -162,6 +163,17 @@
                     if (commandLine[i] === '$' && !stringIdentifier) {
                         continue;
                     }
+                    if (commandLine[i] === "\n" && !stringIdentifier) {
+                        continue;
+                    }
+                    if (commandLine[i] === ';' && !stringIdentifier) {
+                        commandArguments.push(tmpArgument);
+                        commands.push(commandArguments);
+                        tmpArgument = '';
+                        commandArguments = [];
+                        ignoreNextChar = false;
+                        continue;
+                    }
                     tmpArgument += commandLine[i];
                 } else {
                     if (stringIdentifier) {
@@ -174,12 +186,16 @@
             }
 
             commandArguments.push(tmpArgument);
+            commands.push(commandArguments);
 
-            return commandArguments;
+            return commands;
         };
 
         var renderToCodeDom = function(msg) {
-            document.getElementById('php').innerHTML = msg;
+            if (arguments[1] !== void 0) {
+                document.getElementById('php').innerHTML = '';
+            }
+            document.getElementById('php').innerHTML += msg;
             hljs.highlightBlock(document.getElementById('php'));
         };
 
@@ -411,8 +427,16 @@
         }
 
         var convertCurl = function() {
-            var arguments = parseCommand(document.getElementById('bash').value);
+            renderToCodeDom('', true);
+            var commands = parseCommand(document.getElementById('bash').value);
+            for (var i = 0; i < commands.length; i++) {
+                doConvertCurl(commands[i]);
+            }
+        };
+
+        var doConvertCurl = function(arguments) {
             if (arguments[0] !== 'curl') {
+                console.log(arguments);
                 renderToCodeDom('输入命令不合法');
                 return false;
             }
@@ -609,7 +633,7 @@
                 op += "            ->set('postFields', \"" + postFields.replace(/"/g, '\\"') + "\")\n";
             }
 
-            renderToCodeDom(op + "            ->exec();\n\nif ($curlObj->getStatus()) {\n    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());\n} else {\n    var_dump($curlObj->getCurlErrNo());\n}");
+            renderToCodeDom(op + "            ->exec();\n\nif ($curlObj->getStatus()) {\n    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());\n} else {\n    var_dump($curlObj->getCurlErrNo());\n}\n\n");
         };
     </script>
 </html>
