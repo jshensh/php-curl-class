@@ -418,7 +418,8 @@
                 url = '',
                 method = 'get',
                 cookies = [],
-                timeout = 5;
+                timeout = 5,
+                postJson = false;
 
             var getParameter = function(flag, nextArg) {
                 var usedArg = false;
@@ -470,8 +471,15 @@
                     case 'H':
                         var header = nextArg.match(/^(.*?): (.*?)$/);
                         switch (header[1]) {
+                            case 'Content-Type':
+                                if (header[2].indexOf("json")) {
+                                    postJson = true;
+                                } else {
+                                    headers[header[1]] = header[2];
+                                }
+                                break;
                             case 'Cookie':
-                                cookies.push(nextArg);
+                                cookies.push(header[2]);
                                 break;
                             default:
                                 headers[header[1]] = header[2];
@@ -512,6 +520,14 @@
                         .replace('__url__', url)
                         .replace('__method__', method);
 
+            if (timeout !== 5) {
+                op += "            ->set('timeout', " + timeout + ")\n";
+            }
+
+            if (postJson) {
+                op += "            ->set('postType', 'json')\n";
+            }
+
             for (var i in headers) {
                 switch (i) {
                     case 'User-Agent':
@@ -523,19 +539,16 @@
                     case 'Cookie':
                         op += "            ->setCookies('" + headers[i] + "')\n";
                         break;
-                    case 'Content-Type':
-                        if (headers[i].indexOf("json") > -1) {
-                            op += "            ->set('postType', 'json')\n";
-                            break;
-                        }
-                        op += "            ->setHeader('" + i + "', '" + headers[i] + "')\n";
-                        break;
                     default:
                         op += "            ->setHeader('" + i + "', '" + headers[i] + "')\n";
                 }
             }
 
-            if (typeof postFields !== 'string') {
+            for (var i = 0; i < cookies.length; i++) {
+                op += "            ->setCookies('" + cookies[i] + "'" + (i ? ', true' : '') + ")\n";
+            }
+
+            if (typeof postFields !== 'string' || postJson) {
                 if (JSON.stringify(postFields) !== '{}') {
                     op += "            ->set('postFields', [\n";
                 }
@@ -557,7 +570,18 @@
                     return opS;
                 };
 
-                op += getPHPArray(postFields);
+                if (postJson) {
+                    var postObj = [];
+                    try {
+                        var tmp = JSON.parse(postFields);
+                        postObj = tmp;
+                    } catch (e) {
+                        console.error('JSON 字符串解析失败');
+                    }
+                    op += getPHPArray(postObj);
+                } else {
+                    op += getPHPArray(postFields);
+                }
 
                 if (JSON.stringify(postFields) !== '{}') {
                     op = op.replace(/,\n( +)\]/g, "\n$1]").replace(/,\n$/, "\n");
