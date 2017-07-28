@@ -168,7 +168,9 @@
                         continue;
                     }
                     if ([';', '&'].indexOf(commandLine[i]) > -1 && !stringIdentifier) {
-                        commandArguments.push(tmpArgument);
+                        if (tmpArgument) {
+                            commandArguments.push(tmpArgument);
+                        }
                         commands.push(commandArguments);
                         tmpArgument = '';
                         commandArguments = [];
@@ -189,7 +191,9 @@
                 }
             }
 
-            commandArguments.push(tmpArgument);
+            if (tmpArgument) {
+                commandArguments.push(tmpArgument);
+            }
             commands.push(commandArguments);
 
             return commands;
@@ -441,7 +445,7 @@
         var doConvertCurl = function(arguments) {
             if (arguments[0] !== 'curl') {
                 console.log(arguments);
-                renderToCodeDom('输入命令不合法');
+                renderToCodeDom("//输入命令不合法\n\n");
                 return false;
             }
 
@@ -556,7 +560,7 @@
                         var nextArg = (i < (arguments.length - 1)) ? arguments[i + 1] : null;
                         var step = getParameter(flag, nextArg);
                         if (typeof step === 'string') {
-                            renderToCodeDom(step);
+                            renderToCodeDom("//" + step + "\n\n");
                             return false;
                         } else {
                             i += step;
@@ -565,7 +569,7 @@
                 } else {
                     var step = getParameter("--url", arguments[i]);
                     if (typeof step === 'string') {
-                        renderToCodeDom(step);
+                        renderToCodeDom("//" + step + "\n\n");
                         return false;
                     } else {
                         i += step;
@@ -574,7 +578,7 @@
             }
 
             if (!url) {
-                renderToCodeDom('输入命令不合法');
+                renderToCodeDom("//输入命令不合法\n\n");
                 return false;
             }
 
@@ -635,7 +639,7 @@
                         var tmp = JSON.parse(postFields);
                         postObj = tmp;
                     } catch (e) {
-                        renderToCodeDom('JSON 字符串解析失败');
+                        renderToCodeDom("//JSON 字符串解析失败\n\n");
                     }
                     op += getPHPArray(postObj);
                 } else {
