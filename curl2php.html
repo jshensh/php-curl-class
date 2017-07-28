@@ -178,6 +178,11 @@
             return commandArguments;
         };
 
+        var renderToCodeDom = function(msg) {
+            document.getElementById('php').innerHTML = msg;
+            hljs.highlightBlock(document.getElementById('php'));
+        };
+
         var aliases = { // letter: [lname, [ARG_NONE, ARG_BOOL, ARG_STRING], used]
             "*@": ["url",                      2],
             "*4": ["dns-ipv4-addr",            2],
@@ -408,8 +413,7 @@
         var convertCurl = function() {
             var arguments = parseCommand(document.getElementById('bash').value);
             if (arguments[0] !== 'curl') {
-                document.getElementById('php').innerHTML = '输入命令不合法';
-                hljs.highlightBlock(document.getElementById('php'));
+                renderToCodeDom('输入命令不合法');
                 return false;
             }
 
@@ -432,7 +436,7 @@
                 }
 
                 if (aliases[letter] === void 0) {
-                    return 0;
+                    return '无效参数 ' + flag;
                 }
 
                 switch (letter) {
@@ -509,16 +513,27 @@
                         stillflags = false;
                     } else {
                         var nextArg = (i < (arguments.length - 1)) ? arguments[i + 1] : null;
-                        i += getParameter(flag, nextArg);
+                        var step = getParameter(flag, nextArg);
+                        if (typeof step === 'string') {
+                            renderToCodeDom(step);
+                            return false;
+                        } else {
+                            i += step;
+                        }
                     }
                 } else {
-                    i += getParameter("--url", arguments[i]);
+                    var step = getParameter("--url", arguments[i]);
+                    if (typeof step === 'string') {
+                        renderToCodeDom(step);
+                        return false;
+                    } else {
+                        i += step;
+                    }
                 }
             }
 
             if (!url) {
-                document.getElementById('php').innerHTML = '输入命令不合法';
-                hljs.highlightBlock(document.getElementById('php'));
+                renderToCodeDom('输入命令不合法');
                 return false;
             }
 
@@ -579,7 +594,7 @@
                         var tmp = JSON.parse(postFields);
                         postObj = tmp;
                     } catch (e) {
-                        console.error('JSON 字符串解析失败');
+                        renderToCodeDom('JSON 字符串解析失败');
                     }
                     op += getPHPArray(postObj);
                 } else {
@@ -594,8 +609,7 @@
                 op += "            ->set('postFields', \"" + postFields.replace(/"/g, '\\"') + "\")\n";
             }
 
-            document.getElementById('php').innerHTML = op + "            ->exec();\n\nif ($curlObj->getStatus()) {\n    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());\n} else {\n    var_dump($curlObj->getCurlErrNo());\n}";
-            hljs.highlightBlock(document.getElementById('php'));
+            renderToCodeDom(op + "            ->exec();\n\nif ($curlObj->getStatus()) {\n    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());\n} else {\n    var_dump($curlObj->getCurlErrNo());\n}");
         };
     </script>
 </html>
