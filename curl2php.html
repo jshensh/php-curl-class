@@ -640,7 +640,7 @@
                             opS += getPHPArray(f[i], tabs + '    ');
                             opS += tabs + "],\n";
                         } else {
-                            opS += tabs + rightPad("'" + i + "'", maxLength + 2) + ' => ' + (typeof f[i] === 'string' ? ("'" + f[i] + "'") : f[i]) + ",\n";
+                            opS += tabs + rightPad("'" + i + "'", maxLength + 2) + ' => ' + (typeof f[i] === 'string' ? ('"' + f[i].replace(/"/g, '\\"') + '"') : f[i]) + ",\n";
                         }
                     }
                     return opS;
