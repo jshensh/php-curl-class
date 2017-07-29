@@ -434,6 +434,13 @@
             lnameLetter[aliases[i][0]] = i;
         }
 
+        var isEmptyObject = function(e) {
+            for (var t in e) {
+                return !1;
+            }
+            return !0;
+        };
+
         var convertCurl = function() {
             renderToCodeDom('', true);
             var commands = parseCommand(document.getElementById('bash').value);
@@ -443,6 +450,10 @@
         };
 
         var doConvertCurl = function(arguments, requestI) {
+            if (!arguments.length) {
+                return false;
+            }
+
             if (arguments[0] !== 'curl') {
                 console.log(arguments);
                 renderToCodeDom("//输入命令不合法\n\n");
@@ -633,7 +644,7 @@
                     return opS;
                 };
 
-                if (postJson) {
+                if (postJson && !isEmptyObject(postFields)) {
                     var postObj = [];
                     try {
                         var tmp = JSON.parse(postFields);
