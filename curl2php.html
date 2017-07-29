@@ -661,7 +661,7 @@
 
                 if (JSON.stringify(postFields) !== '{}') {
                     op = op.replace(/,\n( +)\]/g, "\n$1]").replace(/,\n$/, "\n");
-                    op += "            ])\n";
+                    op += "                ])\n";
                 }
             } else {
                 op += "                ->set('postFields', \"" + postFields.replace(/"/g, '\\"') + "\")\n";
