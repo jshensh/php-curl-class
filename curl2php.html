@@ -499,6 +499,7 @@
                         if (typeof postFields !== 'object') {
                             break;
                         }
+                        method = method === 'get' ? 'post' : method;
                         Object.assign(postFields, parse_str(nextArg));
                         usedArg = true;
                         break;
@@ -506,6 +507,7 @@
                     case 'da':
                     case 'db':
                         postFields = nextArg;
+                        method = method === 'get' ? 'post' : method;
                         usedArg = true;
                         break;
                     case 'e':
