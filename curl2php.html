@@ -600,37 +600,37 @@
                         .replace('__method__', method);
 
             if (timeout !== 5) {
-                op += "            ->set('timeout', " + timeout + ")\n";
+                op += "                ->set('timeout', " + timeout + ")\n";
             }
 
             if (postJson) {
-                op += "            ->set('postType', 'json')\n";
+                op += "                ->set('postType', 'json')\n";
             }
 
             for (var i in headers) {
                 switch (i) {
                     case 'User-Agent':
-                        op += "            ->set('userAgent', '" + headers[i] + "')\n";
+                        op += "                ->set('userAgent', '" + headers[i] + "')\n";
                         break;
                     case 'Referer':
-                        op += "            ->set('referer', '" + headers[i] + "')\n";
+                        op += "                ->set('referer', '" + headers[i] + "')\n";
                         break;
                     default:
-                        op += "            ->setHeader('" + i + "', '" + headers[i] + "')\n";
+                        op += "                ->setHeader('" + i + "', '" + headers[i] + "')\n";
                 }
             }
 
             for (var i = 0; i < cookies.length; i++) {
-                op += "            ->setCookies('" + cookies[i] + "'" + (i ? ', true' : '') + ")\n";
+                op += "                ->setCookies('" + cookies[i] + "'" + (i ? ', true' : '') + ")\n";
             }
 
             if (typeof postFields !== 'string' || postJson) {
                 if (JSON.stringify(postFields) !== '{}') {
-                    op += "            ->set('postFields', [\n";
+                    op += "                ->set('postFields', [\n";
                 }
 
                 var getPHPArray = function(f) {
-                    var opS = '', tabs = arguments[1] || '                ', maxLength = 0;
+                    var opS = '', tabs = arguments[1] || '                    ', maxLength = 0;
                     for (var i in f) {
                         maxLength = i.length > maxLength ? i.length : maxLength;
                     };
@@ -664,10 +664,10 @@
                     op += "            ])\n";
                 }
             } else {
-                op += "            ->set('postFields', \"" + postFields.replace(/"/g, '\\"') + "\")\n";
+                op += "                ->set('postFields', \"" + postFields.replace(/"/g, '\\"') + "\")\n";
             }
 
-            renderToCodeDom(op + "            ->exec();\n\nif ($curlObj" + requestI + "->getStatus()) {\n    var_dump($curlObj" + requestI + "->getHeader(), $curlObj" + requestI + "->getCookies(), $curlObj" + requestI + "->getBody(), $curlObj" + requestI + "->getInfo());\n} else {\n    var_dump($curlObj" + requestI + "->getCurlErrNo());\n}\n\n");
+            renderToCodeDom(op + "                ->exec();\n\nif ($curlObj" + requestI + "->getStatus()) {\n    var_dump($curlObj" + requestI + "->getHeader(), $curlObj" + requestI + "->getCookies(), $curlObj" + requestI + "->getBody(), $curlObj" + requestI + "->getInfo());\n} else {\n    var_dump($curlObj" + requestI + "->getCurlErrNo());\n}\n\n");
         };
     </script>
 </html>
