@@ -609,11 +609,11 @@
             }
 
             for (var i in headers) {
-                switch (i) {
-                    case 'User-Agent':
+                switch (i.toLowerCase()) {
+                    case 'user-agent':
                         op += "                ->set('userAgent', '" + headers[i] + "')\n";
                         break;
-                    case 'Referer':
+                    case 'referer':
                         op += "                ->set('referer', '" + headers[i] + "')\n";
                         break;
                     default:
