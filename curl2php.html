@@ -631,7 +631,7 @@
                 }
 
                 var getPHPArray = function(f) {
-                    var opS = '', tabs = commandArgs[1] || '                    ', maxLength = 0;
+                    var opS = '', tabs = arguments[1] || '                    ', maxLength = 0;
                     for (var i in f) {
                         maxLength = i.length > maxLength ? i.length : maxLength;
                     };
