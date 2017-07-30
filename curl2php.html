@@ -204,7 +204,7 @@
                 document.getElementById('php').innerHTML = '';
             }
             document.getElementById('php').innerHTML += msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            hljs.highlightBlock(document.getElementById('php'));
+            // hljs.highlightBlock(document.getElementById('php'));
         };
 
         var aliases = { // letter: [lname, ([ARG_NONE, ARG_BOOL, ARG_STRING])]
@@ -441,19 +441,13 @@
             return !0;
         };
 
-        var syncConvert = function(commandArgs, requestI) {
-            setTimeout(function() {
-                doConvertCurl(commandArgs, requestI);
-            }, requestI * 500);
-        };
-
         var convertCurl = function() {
             renderToCodeDom('', true);
             var commands = parseCommand(document.getElementById('bash').value);
             for (var i = 0; i < commands.length; i++) {
-                // syncConvert(commands[i], i);
                 doConvertCurl(commands[i], i);
             }
+            hljs.highlightBlock(document.getElementById('php'));
         };
 
         var doConvertCurl = function(commandArgs, requestI) {
