@@ -441,21 +441,28 @@
             return !0;
         };
 
+        var syncConvert = function(commandArgs, requestI) {
+            setTimeout(function() {
+                doConvertCurl(commandArgs, requestI);
+            }, requestI * 500);
+        };
+
         var convertCurl = function() {
             renderToCodeDom('', true);
             var commands = parseCommand(document.getElementById('bash').value);
             for (var i = 0; i < commands.length; i++) {
+                // syncConvert(commands[i], i);
                 doConvertCurl(commands[i], i);
             }
         };
 
-        var doConvertCurl = function(arguments, requestI) {
-            if (!arguments.length) {
+        var doConvertCurl = function(commandArgs, requestI) {
+            if (!commandArgs.length) {
                 return false;
             }
 
-            if (arguments[0] !== 'curl') {
-                console.log(arguments);
+            if (commandArgs[0] !== 'curl') {
+                console.log(commandArgs);
                 renderToCodeDom("//输入命令不合法\n\n");
                 return false;
             }
@@ -563,14 +570,14 @@
                 return ~~usedArg;
             };
 
-            for (var i = 1, stillflags = true; i < arguments.length; i++) {
-                if (stillflags && arguments[i][0] === '-') {
-                    var flag = arguments[i];
+            for (var i = 1, stillflags = true; i < commandArgs.length; i++) {
+                if (stillflags && commandArgs[i][0] === '-') {
+                    var flag = commandArgs[i];
 
-                    if (arguments[i] === '--') {
+                    if (commandArgs[i] === '--') {
                         stillflags = false;
                     } else {
-                        var nextArg = (i < (arguments.length - 1)) ? arguments[i + 1] : null;
+                        var nextArg = (i < (commandArgs.length - 1)) ? commandArgs[i + 1] : null;
                         var step = getParameter(flag, nextArg);
                         if (typeof step === 'string') {
                             renderToCodeDom("//" + step + "\n\n");
@@ -580,7 +587,7 @@
                         }
                     }
                 } else {
-                    var step = getParameter("--url", arguments[i]);
+                    var step = getParameter("--url", commandArgs[i]);
                     if (typeof step === 'string') {
                         renderToCodeDom("//" + step + "\n\n");
                         return false;
@@ -630,7 +637,7 @@
                 }
 
                 var getPHPArray = function(f) {
-                    var opS = '', tabs = arguments[1] || '                    ', maxLength = 0;
+                    var opS = '', tabs = commandArgs[1] || '                    ', maxLength = 0;
                     for (var i in f) {
                         maxLength = i.length > maxLength ? i.length : maxLength;
                     };
