@@ -28,28 +28,12 @@
     </body>
 
     <script>
-        var parse_str = function(str) {
+        var parseStr = function(str) {
             var strArr = String(str).replace(/^&/, '').replace(/&$/, '').split('&');
-            var sal = strArr.length;
-            var i;
-            var j;
-            var ct;
-            var p;
-            var lastObj;
-            var obj;
-            var undef;
-            var chr;
-            var tmp;
-            var key;
-            var value;
-            var postLeftBracketPos;
-            var keys;
-            var keysLen;
-            var array = {};
-            var _fixStr = function (str) {
-                return decodeURIComponent(str.replace(/\+/g, '%20'));
-            };
-            var $global = (typeof window !== 'undefined' ? window : global);
+            var sal = strArr.length, i, j, ct, p, lastObj, obj, undef, chr, tmp, key, value, postLeftBracketPos, keys, keysLen, array = {}, $global = (typeof window !== 'undefined' ? window : global),
+                _fixStr = function (str) {
+                    return decodeURIComponent(str.replace(/\+/g, '%20'));
+                };
             $global.$locutus = $global.$locutus || {};
             var $locutus = $global.$locutus;
             $locutus.php = $locutus.php || {};
@@ -501,7 +485,7 @@
                             break;
                         }
                         method = method === 'get' ? 'post' : method;
-                        Object.assign(postFields, parse_str(nextArg));
+                        Object.assign(postFields, parseStr(nextArg));
                         usedArg = true;
                         break;
                     case 'dr':
