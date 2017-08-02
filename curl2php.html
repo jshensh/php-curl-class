@@ -512,15 +512,15 @@
                     case 'H':
                         var header = nextArg.match(/^(.*?): (.*?)$/);
                         if (header) {
-                            switch (header[1]) {
-                                case 'Content-Type':
+                            switch (header[1].toLowerCase()) {
+                                case 'content-type':
                                     if (header[2].indexOf("json")) {
                                         postJson = true;
                                     } else {
                                         headers[header[1]] = header[2];
                                     }
                                     break;
-                                case 'Cookie':
+                                case 'cookie':
                                     cookies.push(header[2]);
                                     break;
                                 default:
