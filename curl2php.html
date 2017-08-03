@@ -644,7 +644,7 @@
                         if (header) {
                             switch (header[1].toLowerCase()) {
                                 case 'content-type':
-                                    if (header[2].indexOf("json")) {
+                                    if (header[2].indexOf("json") > -1) {
                                         postJson = true;
                                     } else {
                                         headers[header[1]] = header[2];
