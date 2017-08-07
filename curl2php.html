@@ -268,10 +268,11 @@
                 commandArguments = [],
                 stringIdentifier = '',
                 tmpArgument = '',
-                ignoreNextChar = false;
+                ignoreNextChar = false,
+                ignoreThisLine = false;
 
             for (var i = 0; i < commandLine.length; i++) {
-                if (commandLine[i] === '\\' && !ignoreNextChar) {
+                if (commandLine[i] === '\\' && !ignoreNextChar && !ignoreThisLine) {
                     ignoreNextChar = true;
                     continue;
                 }
@@ -280,6 +281,16 @@
                         tmpArgument += commandLine[i];
                     }
                     ignoreNextChar = false;
+                    continue;
+                }
+                if (ignoreThisLine) {
+                    if (commandLine[i] === "\n") {
+                        ignoreThisLine = false;
+                    }
+                    continue;
+                }
+                if (commandLine[i] === '#' && !stringIdentifier) {
+                    ignoreThisLine = true;
                     continue;
                 }
                 if (commandLine[i] !== ' ') {
