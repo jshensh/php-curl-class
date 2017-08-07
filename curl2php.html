@@ -172,7 +172,6 @@
         });
 
         window.onresize = function(event) {
-            console.log(document.body.clientHeight);
             phpCodeEditor.setSize(null, (document.body.clientHeight - 598 < 0 ? 300 : document.body.clientHeight - 298) + 'px');
         };
 
