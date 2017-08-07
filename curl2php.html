@@ -278,14 +278,13 @@
                     if (commandLine[i] === '$' && !stringIdentifier) {
                         continue;
                     }
-                    if (commandLine[i] === "\n" && !stringIdentifier) {
-                        continue;
-                    }
-                    if ([';', '&'].indexOf(commandLine[i]) > -1 && !stringIdentifier) {
+                    if ([';', '&', "\n"].indexOf(commandLine[i]) > -1 && !stringIdentifier) {
                         if (tmpArgument) {
                             commandArguments.push(tmpArgument);
                         }
-                        commands.push(commandArguments);
+                        if (commandArguments.length) {
+                            commands.push(commandArguments);
+                        }
                         tmpArgument = '';
                         commandArguments = [];
                         ignoreNextChar = false;
@@ -557,9 +556,15 @@
 
         var convertCurl = function() {
             renderToCodeDom('', true);
-            var commands = parseCommand(myCodeMirror.getValue());
+            var commands = parseCommand(myCodeMirror.getValue()), hasCommand = false;
             for (var i = 0; i < commands.length; i++) {
-                doConvertCurl(commands[i], i);
+                if (commands[i].length) {
+                    hasCommand = true;
+                    doConvertCurl(commands[i], i);
+                }
+            }
+            if (!hasCommand) {
+                renderToCodeDom("//没有输入命令");
             }
             hljs.highlightBlock(document.getElementById('php'));
         };
@@ -570,7 +575,6 @@
             }
 
             if (commandArgs[0] !== 'curl') {
-                console.log(commandArgs);
                 renderToCodeDom("//输入命令不合法\n\n");
                 return false;
             }
