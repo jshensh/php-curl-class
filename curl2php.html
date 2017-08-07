@@ -3,12 +3,15 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <title>Curl 转 PHP</title>
-        <link href="http://cdn.bootcss.com/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-        <script src="http://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-        <script src="http://cdn.bootcss.com/highlight.js/9.12.0/languages/php.min.js"></script>
         <link href="http://cdn.bootcss.com/codemirror/5.28.0/codemirror.min.css" rel="stylesheet">
         <script src="http://cdn.bootcss.com/codemirror/5.28.0/codemirror.min.js"></script>
         <script src="http://cdn.bootcss.com/codemirror/5.28.0/mode/shell/shell.min.js"></script>
+        <script src="http://cdn.bootcss.com/codemirror/5.28.0/mode/htmlmixed/htmlmixed.min.js"></script>
+        <script src="http://cdn.bootcss.com/codemirror/5.28.0/mode/xml/xml.min.js"></script>
+        <script src="http://cdn.bootcss.com/codemirror/5.28.0/mode/javascript/javascript.min.js"></script>
+        <script src="http://cdn.bootcss.com/codemirror/5.28.0/mode/css/css.min.js"></script>
+        <script src="http://cdn.bootcss.com/codemirror/5.28.0/mode/clike/clike.min.js"></script>
+        <script src="http://cdn.bootcss.com/codemirror/5.28.0/mode/php/php.min.js"></script>
         <link href="http://cdn.bootcss.com/codemirror/5.28.0/addon/scroll/simplescrollbars.min.css" rel="stylesheet">
         <script src="http://cdn.bootcss.com/codemirror/5.28.0/addon/scroll/simplescrollbars.min.js"></script>
         <style>
@@ -139,24 +142,41 @@
         <div>
             <p>Curl 命令:</p>
             <div style="border: 1px solid #ddd;">
-                <textarea id="bash" rows="7" style="width: 100%;" data-codemirror-mode="text/x-sh" class="file-editor-textarea js-code-textarea"></textarea>
+                <textarea id="bash" style="width: 100%;" class="file-editor-textarea js-code-textarea"></textarea>
             </div>
             <p><button onclick="convertCurl();">Convert</button></p>
             <p>PHP:</p>
-            <div>
-                <pre id="php"></pre>
+            <div style="border: 1px solid #ddd;">
+                <textarea id="php" style="width: 100%;" data-codemirror-mode="text/x-sh" class="file-editor-textarea js-code-textarea"></textarea>
             </div>
         </div>
     </body>
 
     <script>
-        var myCodeMirror = CodeMirror.fromTextArea(document.getElementById('bash'), {
+        var bashCodeEditor = CodeMirror.fromTextArea(document.getElementById('bash'), {
             mode: "shell",
             theme: "github-light",
             lineNumbers: true,
             scrollbarStyle: "simple"
             // lineWrapping: true
         });
+
+        var phpCodeEditor = CodeMirror.fromTextArea(document.getElementById('php'), {
+            mode: "application/x-httpd-php",
+            theme: "github-light",
+            matchBrackets: true,
+            lineNumbers: true,
+            indentUnit: 4,
+            scrollbarStyle: "simple"
+            // lineWrapping: true
+        });
+
+        window.onresize = function(event) {
+            console.log(document.body.clientHeight);
+            phpCodeEditor.setSize(null, (document.body.clientHeight - 298 < 0 ? 300 : document.body.clientHeight - 298) + 'px');
+        };
+
+        phpCodeEditor.setSize(null, (document.body.clientHeight - 298 < 0 ? 300 : document.body.clientHeight - 298) + 'px');
 
         var parseStr = function(str) {
             var strArr = String(str).replace(/^&/, '').replace(/&$/, '').split('&');
@@ -314,10 +334,9 @@
 
         var renderToCodeDom = function(msg) {
             if (arguments[1] !== void 0) {
-                document.getElementById('php').innerHTML = '';
+                phpCodeEditor.setValue("<?php\nrequire('customCurl.php');\n\n");
             }
-            document.getElementById('php').innerHTML += msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            // hljs.highlightBlock(document.getElementById('php'));
+            phpCodeEditor.setValue(phpCodeEditor.getValue() + msg);
         };
 
         var aliases = { // letter: [lname, ([ARG_NONE, ARG_BOOL, ARG_STRING])]
@@ -556,7 +575,7 @@
 
         var convertCurl = function() {
             renderToCodeDom('', true);
-            var commands = parseCommand(myCodeMirror.getValue()), hasCommand = false;
+            var commands = parseCommand(bashCodeEditor.getValue()), hasCommand = false;
             for (var i = 0; i < commands.length; i++) {
                 if (commands[i].length) {
                     hasCommand = true;
@@ -566,7 +585,6 @@
             if (!hasCommand) {
                 renderToCodeDom("//没有输入命令");
             }
-            hljs.highlightBlock(document.getElementById('php'));
         };
 
         var doConvertCurl = function(commandArgs, requestI) {
