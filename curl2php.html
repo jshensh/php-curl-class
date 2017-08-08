@@ -181,7 +181,13 @@
             var strArr = String(str).replace(/^&/, '').replace(/&$/, '').split('&');
             var sal = strArr.length, i, j, ct, p, lastObj, obj, undef, chr, tmp, key, value, postLeftBracketPos, keys, keysLen, array = {}, $global = (typeof window !== 'undefined' ? window : global),
                 _fixStr = function (str) {
-                    return decodeURIComponent(str.replace(/\+/g, '%20'));
+                    var tmp = '';
+                    try {
+                        tmp = decodeURIComponent(str.replace(/\+/g, '%20'));
+                    } catch (e) {
+                        tmp = str.replace(/\+/g, '%20');
+                    }
+                    return tmp;
                 };
             $global.$locutus = $global.$locutus || {};
             var $locutus = $global.$locutus;
