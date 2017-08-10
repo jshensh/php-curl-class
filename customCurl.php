@@ -10,27 +10,18 @@
 // +----------------------------------------------------------------------
 
 /**
- * Custom Curl 结果类
+ * Custom Curl 通用工具类
  * @author  jshensh <jshensh@126.com>
  */
-class CustomCurlStatement
+class CustomCurlCommon
 {
-    private $ch = null,
-            $output = '',
-            $body = '',
-            $header = '',
-            $responseCookies = [],
-            $curlInfo = [],
-            $curlErrNo = 0,
-            $status = false;
-
     /**
      * 解析 Cookie
      * @access private
      * @param string $cookie Cookies 字符串
      * @return array
      */
-    private function parseCookie($cookie) 
+    private static function parseCookie($cookie) 
     {
         $op = [];
         $pieces = array_filter(array_map('trim', explode(';', $cookie)));
@@ -47,6 +38,22 @@ class CustomCurlStatement
         }
         return $op;
     }
+}
+
+/**
+ * Custom Curl 结果类
+ * @author  jshensh <jshensh@126.com>
+ */
+class CustomCurlStatement extends CustomCurlCommon
+{
+    private $ch = null,
+            $output = '',
+            $body = '',
+            $header = '',
+            $responseCookies = [],
+            $curlInfo = [],
+            $curlErrNo = 0,
+            $status = false;
 
     /**
      * 构造方法
@@ -69,7 +76,7 @@ class CustomCurlStatement
         preg_match_all('/Set-Cookie:(.*?)(\r\n|$)/is', $this->header, $responseCookiesArr);
         if (count($responseCookiesArr[1])) {
             foreach ($responseCookiesArr[1] as $value) {
-                $this->responseCookies[] = $this->parseCookie($value);
+                $this->responseCookies[] = self::parseCookie($value);
             }
         }
     }
@@ -140,7 +147,7 @@ class CustomCurlStatement
  * Custom Curl 类
  * @author  jshensh <jshensh@126.com>
  */
-class CustomCurl
+class CustomCurl extends CustomCurlCommon
 {
     private static $defaultConf = [
                 'timeout'         => 5,
@@ -180,30 +187,6 @@ class CustomCurl
         $method = strtolower($method);
         $this->conf = array_merge(self::$defaultConf, self::$userConf);
         $this->method = in_array($method, ['get', 'post', 'put', 'delete']) ? $method : 'get';
-    }
-
-    /**
-     * 解析 Cookie
-     * @access private
-     * @param string $cookie Cookies 字符串
-     * @return array
-     */
-    private static function parseCookie($cookie) 
-    {
-        $op = [];
-        $pieces = array_filter(array_map('trim', explode(';', $cookie)));
-        if (empty($pieces) || !strpos($pieces[0], '=')) {
-            return [];
-        }
-        foreach ($pieces as $part) {
-            $cookieParts = explode('=', $part, 2);
-            $key = trim($cookieParts[0]);
-            $value = isset($cookieParts[1])
-                ? trim($cookieParts[1], " \n\r\t\0\x0B")
-                : true;
-            $op[$key] = $value;
-        }
-        return $op;
     }
 
     /**
