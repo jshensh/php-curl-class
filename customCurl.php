@@ -17,7 +17,7 @@ class CustomCurlCommon
 {
     /**
      * 解析 Cookie
-     * @access private
+     * @access protected
      * @param string $cookie Cookies 字符串
      * @return array
      */
