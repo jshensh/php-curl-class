@@ -181,21 +181,21 @@ if ($curlObj->getStatus()) {
 ### 设置全局配置
 
 ```php
-CustomCurl::setConf('timeout', 3);                     // CURLOPT_TIMEOUT，单位秒，默认值 5
-CustomCurl::setConf('reRequest', 1);                   // 遇到错误时重新尝试的次数，默认值 3
-CustomCurl::setConf('maxRedirs', 1);                   // CURLOPT_MAXREDIRS，默认值 3
-CustomCurl::setConf('ignoreCurlError', 1);             // 忽略 Curl 错误，默认值 False
-CustomCurl::setConf('followLocation', 1);              // CURLOPT_FOLLOWLOCATION，默认值 True
-CustomCurl::setConf('referer', 'http://google.com');   // 设置 HTTP REFERER
-CustomCurl::setConf('userAgent', 'Mozilla');           // 设置 User-Agent
-CustomCurl::setConf('customHeader', ['X-PJAX: true']); // 设置 Header，要求传入数组
-CustomCurl::setConf('sendCookies', 'a=b; b=c');        // 设置 Cookies，要求传入一维数组或者字符串
-CustomCurl::setConf('autoRefer', 1);                   // CURLOPT_AUTOREFERER，默认值 True
-CustomCurl::setConf('postType', 'json');               // 提交方式，可选 ['form', 'json', 'string']，默认值 Form
-CustomCurl::setConf('proxy', '');                      // 代理
-CustomCurl::setConf('proxyPort', 8080);                // 代理端口
-CustomCurl::setConf('proxyUserPwd', '');               // 代理用户名密码
-CustomCurl::setConf('proxyType', '');                  // 代理方式
+CustomCurl::setConf('timeout', 3);                          // CURLOPT_TIMEOUT，单位秒，默认值 5
+CustomCurl::setConf('reRequest', 1);                        // 遇到错误时重新尝试的次数，默认值 3
+CustomCurl::setConf('maxRedirs', 1);                        // CURLOPT_MAXREDIRS，默认值 3
+CustomCurl::setConf('ignoreCurlError', 1);                  // 忽略 Curl 错误，默认值 False
+CustomCurl::setConf('followLocation', 1);                   // CURLOPT_FOLLOWLOCATION，默认值 True
+CustomCurl::setConf('referer', 'http://google.com');        // 设置 HTTP REFERER
+CustomCurl::setConf('userAgent', 'Mozilla');                // 设置 User-Agent
+CustomCurl::setConf('customHeader', ['X-PJAX: true']);      // 设置 Header，要求传入数组
+CustomCurl::setConf('sendCookies', 'a=b; b=c');             // 设置 Cookies，要求传入一维数组或者字符串
+CustomCurl::setConf('autoRefer', 1);                        // CURLOPT_AUTOREFERER，默认值 True
+CustomCurl::setConf('postType', 'json');                    // 提交方式，可选 ['form', 'json', 'string']，默认值 Form
+CustomCurl::setConf('proxy', '127.0.0.1');                  // 代理
+CustomCurl::setConf('proxyPort', 8080);                     // 代理端口
+CustomCurl::setConf('proxyUserPwd', [username]:[password]); // 代理用户名密码
+CustomCurl::setConf('proxyType', CURLPROXY_HTTP);           // 代理方式
 
 $curlObj0 = CustomCurl::init('http://lab.imjs.work/server.php')
             ->set('userAgent', 'Test') // 在当前会话中覆盖预设值
