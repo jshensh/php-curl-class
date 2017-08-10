@@ -21,7 +21,7 @@ class CustomCurlCommon
      * @param string $cookie Cookies 字符串
      * @return array
      */
-    private static function parseCookie($cookie) 
+    protected static function parseCookie($cookie) 
     {
         $op = [];
         $pieces = array_filter(array_map('trim', explode(';', $cookie)));
