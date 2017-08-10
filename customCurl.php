@@ -142,24 +142,30 @@ class CustomCurlStatement
  */
 class CustomCurl
 {
+    private static $defaultConf = [
+                'timeout'         => 5,
+                'reRequest'       => 3,
+                'maxRedirs'       => 3,
+                'ignoreCurlError' => false,
+                'followLocation'  => true,
+                'referer'         => '',
+                'userAgent'       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+                'customHeader'    => [],
+                'sendCookies'     => [],
+                'autoRefer'       => 1,
+                'postType'        => 'form',
+                'proxy'           => '',
+                'proxyPort'       => 8080,
+                'proxyUserPwd'    => '',
+                'proxyType'       => CURLPROXY_HTTP
+            ],
+            $userConf = [];
+
     private $url = '',
-            $timeout = 5,
-            $reRequest = 3,
-            $maxRedirs = 3,
             $method = '',
-            $postFields = [],
-            $ignoreCurlError = false,
-            $followLocation = true,
-            $referer = '',
-            $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
-            $customHeader = [],
-            $sendCookies = [],
-            $autoRefer = 1,
-            $postType = 'form',
-            $proxy = false,
-            $proxyPort = 8080,
-            $proxyUserPwd = '',
-            $proxyType = CURLPROXY_HTTP;
+            $conf = [
+                'postFields' => []
+            ];
 
     /**
      * 构造方法
@@ -172,7 +178,79 @@ class CustomCurl
     {
         $this->url = $url;
         $method = strtolower($method);
+        $this->conf = array_merge(self::$defaultConf, self::$userConf);
         $this->method = in_array($method, ['get', 'post', 'put', 'delete']) ? $method : 'get';
+    }
+
+    /**
+     * 解析 Cookie
+     * @access private
+     * @param string $cookie Cookies 字符串
+     * @return array
+     */
+    private static function parseCookie($cookie) 
+    {
+        $op = [];
+        $pieces = array_filter(array_map('trim', explode(';', $cookie)));
+        if (empty($pieces) || !strpos($pieces[0], '=')) {
+            return [];
+        }
+        foreach ($pieces as $part) {
+            $cookieParts = explode('=', $part, 2);
+            $key = trim($cookieParts[0]);
+            $value = isset($cookieParts[1])
+                ? trim($cookieParts[1], " \n\r\t\0\x0B")
+                : true;
+            $op[$key] = $value;
+        }
+        return $op;
+    }
+
+    /**
+     * 设置默认配置
+     * @access public
+     * @param string $k 配置 Key
+     * @param string $v 配置 Value
+     * @return bool
+     */
+    public static function setConf($k, $v)
+    {
+        if (!isset(self::$defaultConf[$k])) {
+            return false;
+        }
+        if ($k === 'sendCookies') {
+            if (is_string($v)) {
+                $v = self::parseCookie($v);
+            }
+            if (is_array($v)) {
+                if (count($v) !== count($v, 1)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        self::$userConf[$k] = $v;
+        return true;
+    }
+
+    /**
+     * 恢复默认配置
+     * @access public
+     * @param string $k 配置 Key
+     * @return bool
+     */
+    public static function resetConf($k = null)
+    {
+        if ($k) {
+            if (!isset(self::$userConf[$k])) {
+                return false;
+            }
+            unset(self::$userConf[$k]);
+            return true;
+        }
+        self::$userConf = [];
+        return true;
     }
 
     /**
@@ -239,7 +317,7 @@ class CustomCurl
             default:
                 return $this;
         }
-        $this->$k = $v;
+        $this->conf[$k] = $v;
         return $this;
     }
 
@@ -252,7 +330,7 @@ class CustomCurl
      */
     public function setHeader($k, $v)
     {
-        $this->customHeader[] = "{$k}: {$v}";
+        $this->conf['customHeader'][] = "{$k}: {$v}";
         return $this;
     }
 
@@ -263,7 +341,7 @@ class CustomCurl
      */
     public function clearHeaders()
     {
-        $this->customHeader = [];
+        $this->conf['customHeader'] = [];
         return $this;
     }
 
@@ -276,32 +354,8 @@ class CustomCurl
      */
     public function setCookie($k, $v)
     {
-        $this->sendCookies[$k] = $v;
+        $this->conf['sendCookies'][$k] = $v;
         return $this;
-    }
-
-    /**
-     * 解析 Cookie
-     * @access private
-     * @param string $cookie Cookies 字符串
-     * @return array
-     */
-    private function parseCookie($cookie) 
-    {
-        $op = [];
-        $pieces = array_filter(array_map('trim', explode(';', $cookie)));
-        if (empty($pieces) || !strpos($pieces[0], '=')) {
-            return [];
-        }
-        foreach ($pieces as $part) {
-            $cookieParts = explode('=', $part, 2);
-            $key = trim($cookieParts[0]);
-            $value = isset($cookieParts[1])
-                ? trim($cookieParts[1], " \n\r\t\0\x0B")
-                : true;
-            $op[$key] = $value;
-        }
-        return $op;
     }
 
     /**
@@ -313,7 +367,7 @@ class CustomCurl
      */
     public function setCookies($parm, $append = false)
     {
-        $cookies = is_array($parm) ? $parm : $this->parseCookie($parm);
+        $cookies = is_array($parm) ? $parm : self::parseCookie($parm);
         $cookiesC = count($cookies);
 
         if (!$cookiesC || ($cookiesC !== count($cookies, 1))) {
@@ -321,9 +375,9 @@ class CustomCurl
         }
 
         if ($append) {
-            $this->sendCookies = array_merge($this->sendCookies, $cookies);
+            $this->conf['sendCookies'] = array_merge($this->conf['sendCookies'], $cookies);
         } else {
-            $this->sendCookies = $cookies;
+            $this->conf['sendCookies'] = $cookies;
         }
 
         return $this;
@@ -336,7 +390,7 @@ class CustomCurl
      */
     public function clearCookies()
     {
-        $this->sendCookies = [];
+        $this->conf['sendCookies'] = [];
         return $this;
     }
 
@@ -350,58 +404,58 @@ class CustomCurl
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->conf['timeout']);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_REFERER, $this->referer);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $this->followLocation);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, $this->maxRedirs);
-        curl_setopt($ch, CURLOPT_AUTOREFERER, $this->autoRefer);
+        curl_setopt($ch, CURLOPT_REFERER, $this->conf['referer']);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->conf['userAgent']);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $this->conf['followLocation']);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, $this->conf['maxRedirs']);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, $this->conf['autoRefer']);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($this->method));
-        if (count($this->sendCookies)) {
+        if (count($this->conf['sendCookies'])) {
             $sendCookies = '';
-            foreach ($this->sendCookies as $key => $value) {
+            foreach ($this->conf['sendCookies'] as $key => $value) {
                 $sendCookies .= "{$key}={$value}; ";
             }
             curl_setopt($ch, CURLOPT_COOKIE, $sendCookies);
         }
         if (in_array($this->method, ['post', 'put'])) {
-            if ($this->postType === 'json') {
-                $postJsonData = json_encode($this->postFields);
+            if ($this->conf['postType'] === 'json') {
+                $postJsonData = json_encode($this->conf['postFields']);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $postJsonData);
-                $this->customHeader[] = 'Content-Type: application/json';
-                $this->customHeader[] = 'Content-Length: ' . strlen($postJsonData);
-            } else if ($this->postType === 'form') {
-                if (is_array($this->postFields)) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($this->postFields));
+                $this->conf['customHeader'][] = 'Content-Type: application/json';
+                $this->conf['customHeader'][] = 'Content-Length: ' . strlen($postJsonData);
+            } else if ($this->conf['postType'] === 'form') {
+                if (is_array($this->conf['postFields'])) {
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($this->conf['postFields']));
                 }
             } else {
-                if (is_string($this->postFields)) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postFields);
-                    $this->customHeader[] = 'Content-Type: text/plain';
-                    $this->customHeader[] = 'Content-Length: ' . strlen($this->postFields);
+                if (is_string($this->conf['postFields'])) {
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $this->conf['postFields']);
+                    $this->conf['customHeader'][] = 'Content-Type: text/plain';
+                    $this->conf['customHeader'][] = 'Content-Length: ' . strlen($this->conf['postFields']);
                 }
             }
         }
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->customHeader);
-        if ($this->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
-            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
-            if ($this->proxyUserPwd) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUserPwd);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->conf['customHeader']);
+        if ($this->conf['proxy']) {
+            curl_setopt($ch, CURLOPT_PROXY, $this->conf['proxy']);
+            curl_setopt($ch, CURLOPT_PROXYPORT, $this->conf['proxyPort']);
+            if ($this->conf['proxyUserPwd']) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->conf['proxyUserPwd']);
             }
-            curl_setopt($ch, CURLOPT_PROXYTYPE, $this->proxyType);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, $this->conf['proxyType']);
         }
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_NOBODY, false);
         $output = curl_exec($ch);
         $curlErrNo = curl_errno($ch);
-        if ($curlErrNo === 0 || ($this->ignoreCurlError && $output)) {
+        if ($curlErrNo === 0 || ($this->conf['ignoreCurlError'] && $output)) {
             return new CustomCurlStatement(0, $ch, $output);
         }
-        $this->reRequest--;
-        if ($this->reRequest > 0) {
+        $this->conf['reRequest']--;
+        if ($this->conf['reRequest'] > 0) {
             return $this->exec();
         }
         return new CustomCurlStatement($curlErrNo, $ch, $output);
