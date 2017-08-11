@@ -749,6 +749,10 @@
                 return false;
             }
 
+            if ((['GET', 'POST', 'PUT', 'DELETE']).indexOf(method.toUpperCase()) === -1) {
+                return false;
+            }
+
             var op = "$curlObj" + requestI + " = CustomCurl::init('__url__'__method__)\n"
                         .replace('__url__', url)
                         .replace('__method__', (method.toUpperCase() === 'GET' ? '' : (", '" + method.toUpperCase() + "'")));
