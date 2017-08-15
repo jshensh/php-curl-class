@@ -18,8 +18,8 @@ CustomCurl::setConf('proxyUserPwd', '');
 CustomCurl::setConf('proxyType', '');
 
 $curlObj0 = CustomCurl::init('http://lab.imjs.work/server.php')
-            ->set('userAgent', 'Test')
-            ->exec();
+                ->set('userAgent', 'Test')
+                ->exec();
 
 if ($curlObj0->getStatus()) {
     var_dump($curlObj0->getHeader(), $curlObj0->getCookies(), $curlObj0->getBody(), $curlObj0->getInfo());
