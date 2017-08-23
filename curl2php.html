@@ -796,13 +796,14 @@
                     for (var i in f) {
                         maxLength = i.length > maxLength ? i.length : maxLength;
                     };
+
                     for (var i in f) {
                         if (typeof f[i] === 'object') {
-                            opS += tabs + rightPad((typeof i === 'string' ? ('"' + i.replace(/"/g, '\\"') + '"') : i), maxLength + 2) + " => [\n";
+                            opS += tabs + (toString.apply(f) === '[object Array]' ? '' : (rightPad((typeof i === 'string' ? ('"' + i.replace(/"/g, '\\"') + '"') : i), maxLength + 2) + ' => ')) + "[\n";
                             opS += getPHPArray(f[i], tabs + '    ');
                             opS += tabs + "],\n";
                         } else {
-                            opS += tabs + rightPad((typeof i === 'string' ? ('"' + i.replace(/"/g, '\\"') + '"') : i), maxLength + 2) + ' => ' + (typeof f[i] === 'string' ? ('"' + f[i].replace(/"/g, '\\"') + '"') : f[i]) + ",\n";
+                            opS += tabs + (toString.apply(f) === '[object Array]' ? '' : (rightPad((typeof i === 'string' ? ('"' + i.replace(/"/g, '\\"') + '"') : i), maxLength + 2) + ' => ')) + (typeof f[i] === 'string' ? ('"' + f[i].replace(/"/g, '\\"') + '"') : f[i]) + ",\n";
                         }
                     }
                     return opS;
