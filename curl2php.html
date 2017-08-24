@@ -600,7 +600,7 @@
                 }
             }
             if (!hasCommand) {
-                renderToCodeDom("//没有输入命令");
+                renderToCodeDom("// 没有输入命令");
             }
         };
 
@@ -610,7 +610,7 @@
             }
 
             if (commandArgs[0] !== 'curl') {
-                renderToCodeDom("//输入命令不合法\n\n");
+                renderToCodeDom("// 输入命令不合法\n\n");
                 return false;
             }
 
@@ -727,7 +727,7 @@
                         var nextArg = (i < (commandArgs.length - 1)) ? commandArgs[i + 1] : null;
                         var step = getParameter(flag, nextArg);
                         if (typeof step === 'string') {
-                            renderToCodeDom("//" + step + "\n\n");
+                            renderToCodeDom("// " + step + "\n\n");
                             return false;
                         } else {
                             i += step;
@@ -736,7 +736,7 @@
                 } else {
                     var step = getParameter("--url", commandArgs[i]);
                     if (typeof step === 'string') {
-                        renderToCodeDom("//" + step + "\n\n");
+                        renderToCodeDom("// " + step + "\n\n");
                         return false;
                     } else {
                         i += step;
@@ -745,11 +745,12 @@
             }
 
             if (!url) {
-                renderToCodeDom("//输入命令不合法\n\n");
+                renderToCodeDom("// 输入命令不合法\n\n");
                 return false;
             }
 
             if ((['GET', 'POST', 'PUT', 'DELETE']).indexOf(method.toUpperCase()) === -1) {
+                renderToCodeDom('// ' + method.toUpperCase() + " 头不做处理\n\n");
                 return false;
             }
 
@@ -815,7 +816,7 @@
                         var tmp = JSON.parse(postFields);
                         postObj = tmp;
                     } catch (e) {
-                        renderToCodeDom("//JSON 字符串解析失败\n\n");
+                        renderToCodeDom("// JSON 字符串解析失败\n\n");
                     }
                     op += getPHPArray(postObj);
                 } else {
