@@ -703,7 +703,7 @@
                         usedArg = true;
                         break;
                     case 'u':
-                        headers['Authorization'] = btoa(nextArg);
+                        headers['Authorization'] = 'Basic ' + btoa(nextArg);
                         usedArg = true;
                         break;
                     case 'X':
