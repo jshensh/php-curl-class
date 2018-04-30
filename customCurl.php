@@ -156,7 +156,7 @@ class CustomCurl extends CustomCurlCommon
                 'ignoreCurlError' => false,
                 'followLocation'  => false,
                 'referer'         => '',
-                'userAgent'       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+                'userAgent'       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36',
                 'customHeader'    => [],
                 'sendCookies'     => [],
                 'autoRefer'       => 1,

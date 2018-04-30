@@ -239,9 +239,9 @@ if ($curlObj3->getStatus()) {
 
 ## 版权信息
 
-Custom Curl 遵循 Apache2 开源协议发布，并提供免费使用。
+Custom Curl 遵循 GPL-3.0 开源协议发布，并提供免费使用。
 
-版权所有Copyright © 2017 by jshensh (http://233.imjs.work)
+版权所有Copyright © 2018 by jshensh (http://233.imjs.work)
 
 All rights reserved。
 
