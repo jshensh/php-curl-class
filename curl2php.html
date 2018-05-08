@@ -267,85 +267,202 @@
             return str.length >= ~~len ? str : str + (new Array(~~len - str.length + 1).join(' '));
         };
 
-        var parseCommand = function(commandLine) {
-            commandLine = commandLine.trim();
+        // https://github.com/substack/node-shell-quote
 
-            var commands = [],
-                commandArguments = [],
-                stringIdentifier = '',
-                tmpArgument = '',
-                ignoreNextChar = false,
-                ignoreThisLine = false;
+        var parseCommand = function(command) {
+            var SINGLE_QUOTE = '"((\\\\"|[^"])*?)"';
+            var DOUBLE_QUOTE = '\'((\\\\\'|[^\'])*?)\'';
+            var CONTROL = '(?:' + [
+                '\\|\\|', '\\&\\&', ';;', '\\|\\&', "[&;()|<>\n]"
+            ].join('|') + ')';
+            var META = '|&;()<> \\t';
+            var BAREWORD = '(\\\\[\'"' + META + ']|[^\\s\'"' + META + '])+';
 
-            for (var i = 0; i < commandLine.length; i++) {
-                if (commandLine[i] === '\\' && !ignoreNextChar && !ignoreThisLine) {
-                    ignoreNextChar = true;
-                    continue;
-                }
-                if (ignoreNextChar) {
-                    if (commandLine[i] !== "\n" || stringIdentifier) {
-                        tmpArgument += commandLine[i];
+            var TOKEN = '';
+            for (var i = 0; i < 4; i++) {
+                TOKEN += (Math.pow(16,8)*Math.random()).toString(16);
+            }
+
+            var commandArgus = (function (s, env) {
+                var chunker = new RegExp([
+                    '(' + CONTROL + ')', // control chars
+                    '(' + BAREWORD + '|' + SINGLE_QUOTE + '|' + DOUBLE_QUOTE + ')*'
+                ].join('|'), 'g');
+                var match = s.match(chunker).filter(function(value) { return value !== ''; });
+                var commented = false;
+
+                if (!match) return [];
+                if (!env) env = {};
+
+                return match.map(function (s, j) {
+                    if (commented) {
+                        return;
                     }
-                    ignoreNextChar = false;
-                    continue;
-                }
-                if (ignoreThisLine) {
-                    if (commandLine[i] === "\n") {
-                        ignoreThisLine = false;
+                    if (RegExp('^' + CONTROL + '$').test(s)) {
+                        return { op: s };
                     }
-                    continue;
-                }
-                if (commandLine[i] === '#' && !stringIdentifier) {
-                    ignoreThisLine = true;
-                    continue;
-                }
-                if (commandLine[i] !== ' ') {
-                    if (commandLine[i] === '"' || commandLine[i] === '\'') {
-                        if (stringIdentifier === commandLine[i]) {
-                            stringIdentifier = '';
-                            continue;
+
+
+                    // Hand-written scanner/parser for Bash quoting rules:
+                    //
+                    //  1. inside single quotes, all characters are printed literally.
+                    //  2. inside double quotes, all characters are printed literally
+                    //     except variables prefixed by '$' and backslashes followed by
+                    //     either a double quote or another backslash.
+                    //  3. outside of any quotes, backslashes are treated as escape
+                    //     characters and not printed (unless they are themselves escaped)
+                    //  4. quote context can switch mid-token if there is no whitespace
+                    //     between the two quote contexts (e.g. all'one'"token" parses as
+                    //     "allonetoken")
+                    var SQ = "'";
+                    var DQ = '"';
+                    var DS = '$';
+                    var BS = '\\';
+                    var quote = false;
+                    var esc = false;
+                    var out = '';
+                    var isGlob = false;
+                    var isDSString = false;
+
+                    for (var i = 0, len = s.length; i < len; i++) {
+                        var c = s.charAt(i);
+                        isGlob = isGlob || (!quote && (c === '*' || c === '?'));
+                        if (isDSString) {
+                            if (c === BS) {
+                                i += 1;
+                                c = s.charAt(i);
+                                if (c === BS || c === quote) {
+                                    out += c;
+                                } else {
+                                    if (quote === SQ && c === DQ) {
+                                        out += c;
+                                    } else {
+                                        out += BS + c;
+                                    }
+                                }
+                            } else {
+                                if (c === quote) {
+                                    quote = false;
+                                    isDSString = false;
+                                } else {
+                                    out += c;
+                                }
+                            }
+                        } else if (esc) {
+                            out += c;
+                            esc = false;
+                        } else if (quote) {
+                            if (c === quote) {
+                                quote = false;
+                            } else if (quote == SQ) {
+                                out += c;
+                            } else { // Double quote
+                                if (c === BS) {
+                                    i += 1;
+                                    c = s.charAt(i);
+                                    if (c === DQ || c === BS || c === DS) {
+                                        out += c;
+                                    } else {
+                                        out += BS + c;
+                                    }
+                                } else if (c === DS) {
+                                    out += parseEnvVar();
+                                } else {
+                                    out += c;
+                                }
+                            }
+                        } else if (c === DQ || c === SQ) {
+                            quote = c;
+                        } else if (RegExp('^' + CONTROL + '$').test(c)) {
+                            return { op: s };
+                        } else if (RegExp('^#$').test(c)) {
+                            commented = true;
+                            if (out.length){
+                                return [out, { comment: s.slice(i+1) + match.slice(j+1).join(' ') }];
+                            }
+                            return [{ comment: s.slice(i+1) + match.slice(j+1).join(' ') }];
+                        } else if (c === BS) {
+                            esc = true;
+                        } else if (c === DS) {
+                            out += parseEnvVar();
+                        } else out += c;
+                    }
+
+                    if (isGlob) return {op: 'glob', pattern: out};
+
+                    return out;
+
+                    function parseEnvVar() {
+                        i += 1;
+                        var varend, varname;
+                        //debugger
+                        if (s.charAt(i) === '{') {
+                            i += 1;
+                            if (s.charAt(i) === '}') {
+                                throw new Error("Bad substitution: " + s.substr(i - 2, 3));
+                            }
+                            varend = s.indexOf('}', i);
+                            if (varend < 0) {
+                                throw new Error("Bad substitution: " + s.substr(i));
+                            }
+                            varname = s.substr(i, varend - i);
+                            i = varend;
+                        } else if (/[*@#?$!_\-]/.test(s.charAt(i))) {
+                            varname = s.charAt(i);
+                            i += 1;
+                        } else if (s.charAt(i) === SQ || s.charAt(i) === DQ) {
+                            isDSString = true;
+                            quote = s.charAt(i);
                         } else {
-                            if (!stringIdentifier) {
-                                stringIdentifier = commandLine[i];
-                                continue;
+                            varend = s.substr(i).match(/[^\w\d_]/);
+                            if (!varend) {
+                                varname = s.substr(i);
+                                i = s.length;
+                            } else {
+                                varname = s.substr(i, varend.index);
+                                i += varend.index - 1;
                             }
                         }
+                        return getVar(null, '', varname);
                     }
-                    if (commandLine[i] === '$' && !stringIdentifier) {
-                        continue;
+                })
+                // finalize parsed aruments
+                .reduce(function(prev, arg){
+                    if (arg === undefined){
+                        return prev;
                     }
-                    if ([';', '&', "\n"].indexOf(commandLine[i]) > -1 && !stringIdentifier) {
-                        if (tmpArgument) {
-                            commandArguments.push(tmpArgument);
-                        }
-                        if (commandArguments.length) {
-                            commands.push(commandArguments);
-                        }
-                        tmpArgument = '';
-                        commandArguments = [];
-                        ignoreNextChar = false;
-                        continue;
+                    return prev.concat(arg);
+                },[]);
+
+                function getVar (_, pre, key) {
+                    var r = typeof env === 'function' ? env(key) : env[key];
+                    if (r === undefined) r = '';
+
+                    if (typeof r === 'object') {
+                        return pre + TOKEN + json.stringify(r) + TOKEN;
                     }
-                    tmpArgument += commandLine[i];
-                } else {
-                    if (stringIdentifier) {
-                        tmpArgument += commandLine[i];
-                    } else {
-                        if (!tmpArgument) {
-                            continue;
-                        }
-                        commandArguments.push(tmpArgument);
-                        tmpArgument = '';
-                    }
+                    else return pre + r;
                 }
+            })(command, {});
+
+            if (commandArgus.length === 0) {
+                return [];
             }
 
-            if (tmpArgument) {
-                commandArguments.push(tmpArgument);
-            }
-            commands.push(commandArguments);
+            var commandIndex = 0, returnCommands = [[]];
 
-            return commands;
+            for (var i = 0; i < commandArgus.length; i++) {
+                if (typeof commandArgus[i] === 'object' && commandArgus[i]['op'] !== void 0) {
+                    if (returnCommands[commandIndex].length) {
+                        returnCommands.push([]);
+                        commandIndex = returnCommands.length - 1;
+                    }
+                    continue;
+                }
+                returnCommands[commandIndex].push(commandArgus[i]);
+            }
+
+            return returnCommands;
         };
 
         var renderToCodeDom = function(msg) {
@@ -575,7 +692,7 @@
                 "#":  ["progress-bar",             1],
                 ":":  ["next",                     0],
             },
-            userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36';
+            userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36';
 
         var lnameLetter = {};
 
