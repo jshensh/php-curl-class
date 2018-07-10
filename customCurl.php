@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | Custom Curl
 // +----------------------------------------------------------------------
-// | Copyright (c) 2017 http://233.imjs.work All rights reserved.
+// | Copyright (c) 2018 http://233.imjs.work All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( https://www.gnu.org/licenses/gpl-3.0.html )
 // +----------------------------------------------------------------------
@@ -166,13 +166,20 @@ class CustomCurl extends CustomCurlCommon
                 'proxyUserPwd'    => '',
                 'proxyType'       => CURLPROXY_HTTP
             ],
-            $userConf = [];
+            $defaultCurlopt = [
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_ENCODING       => ''
+            ],
+            $userConf = [],
+            $userCurlopt = [];
 
     private $url = '',
             $method = '',
             $conf = [
                 'postFields' => []
-            ];
+            ],
+            $curlopt = [];
 
     /**
      * 构造方法
@@ -186,6 +193,10 @@ class CustomCurl extends CustomCurlCommon
         $this->url = $url;
         $method = strtolower($method);
         $this->conf = array_merge(self::$defaultConf, self::$userConf);
+        $this->curlopt = self::$defaultCurlopt;
+        foreach (self::$userCurlopt as $key => $value) {
+            $this->curlopt[$key] = $value;
+        }
         $this->method = in_array($method, ['get', 'post', 'put', 'delete']) ? $method : 'get';
     }
 
@@ -233,6 +244,41 @@ class CustomCurl extends CustomCurlCommon
             return true;
         }
         self::$userConf = [];
+        return true;
+    }
+
+    /**
+     * 设置默认 CurlOpt
+     * @access public
+     * @param string $k 配置 Key
+     * @param string $v 配置 Value
+     * @return bool
+     */
+    public static function setCurlOptConf($k, $v)
+    {
+        if (!isset(self::$defaultCurlopt[$k])) {
+            return false;
+        }
+        self::$userCurlopt[$k] = $v;
+        return true;
+    }
+
+    /**
+     * 恢复默认 CurlOpt
+     * @access public
+     * @param string $k 配置 Key
+     * @return bool
+     */
+    public static function resetCurlOptConf($k = null)
+    {
+        if ($k) {
+            if (!isset(self::$userCurlopt[$k])) {
+                return false;
+            }
+            unset(self::$userCurlopt[$k]);
+            return true;
+        }
+        self::$userCurlopt = [];
         return true;
     }
 
@@ -301,6 +347,34 @@ class CustomCurl extends CustomCurlCommon
                 return $this;
         }
         $this->conf[$k] = $v;
+        return $this;
+    }
+
+    /**
+     * 设置 CurlOpt
+     * @access public
+     * @param string $k 设置项 Key
+     * @param string $v 设置项 Value
+     * @return CustomCurl
+     */
+    public function setCurlOpt($k, $v)
+    {
+        switch ($k) {
+            case CURLOPT_SSL_VERIFYPEER:
+                // no break
+            case CURLOPT_SSL_VERIFYHOST:
+                if (!is_bool($v)) {
+                    return $this;
+                }
+            case CURLOPT_ENCODING:
+                if (!is_string($v)) {
+                    return $this;
+                }
+                break;
+            default:
+                return $this;
+        }
+        $this->curlopt[$k] = $v;
         return $this;
     }
 
@@ -388,8 +462,6 @@ class CustomCurl extends CustomCurlCommon
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->conf['timeout']);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_REFERER, $this->conf['referer']);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->conf['userAgent']);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $this->conf['followLocation']);
@@ -432,6 +504,9 @@ class CustomCurl extends CustomCurlCommon
         }
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_NOBODY, false);
+        foreach ($this->curlopt as $key => $value) {
+            curl_setopt($ch, $key, $value);
+        }
         $output = curl_exec($ch);
         $curlErrNo = curl_errno($ch);
         if ($curlErrNo === 0 || ($this->conf['ignoreCurlError'] && $output)) {

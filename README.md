@@ -11,11 +11,13 @@ Custom Curl (嗯懒得取名字)
     - [PUT 方法](#put-方法传输-json-数据)
     - [Cookie 字符串/数组](#cookie-字符串数组)
     - [Header](#header)
+    - [自定义 CurlOpt](#自定义-CurlOpt)
 - [设置项](#设置项)
 - [杂项](#杂项)
     - [多次请求同一地址](#多次请求同一地址)
     - [代理](#代理)
     - [设置全局配置](#设置全局配置)
+    - [设置全局 CurlOpt 配置](#设置全局-CurlOpt-配置)
 
 
 ## 使用示例
@@ -112,6 +114,22 @@ if ($curlObj->getStatus()) {
 }
 ```
 
+### 自定义 CurlOpt
+
+```php
+$curlObj = CustomCurl::init('http://example.com')
+            ->setCurlOpt(CURLOPT_SSL_VERIFYPEER, true)  // CURLOPT_SSL_VERIFYPEER，默认值 False
+            ->setCurlOpt(CURLOPT_SSL_VERIFYHOST, true)  // CURLOPT_SSL_VERIFYHOST，默认值 False
+            ->setCurlOpt(CURLOPT_ENCODING, '')          // CURLOPT_ENCODING，默认值 ''
+            ->exec();
+
+if ($curlObj->getStatus()) {
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+} else {
+    var_dump($curlObj->getCurlErrNo());
+}
+```
+
 ## 设置项
 
 ```php
@@ -121,7 +139,7 @@ $curlObj = CustomCurl::init('http://cn.bing.com')
             ->set('timeout', 1)                         // CURLOPT_TIMEOUT，单位秒，默认值 5
             ->set('reRequest', 1)                       // 遇到错误时重新尝试的次数，默认值 3
             ->set('postFields', ['fname' => 'jshensh']) // POST 提交参数，数组
-            ->set('postType', 'json')                   // 提交方式，可选 ['form', 'json', 'string']，默认值 Form
+            ->set('postType', 'json')                   // 提交方式，可选 ['form', 'json', 'string']，默认值 'form'
             ->set('followLocation', 1)                  // CURLOPT_FOLLOWLOCATION，默认值 False
             ->set('autoRefer', 1)                       // CURLOPT_AUTOREFERER，默认值 True
             ->set('maxRedirs', 1)                       // CURLOPT_MAXREDIRS，默认值 3
@@ -191,7 +209,7 @@ CustomCurl::setConf('userAgent', 'Mozilla');                  // 设置 User-Age
 CustomCurl::setConf('customHeader', ['X-PJAX: true']);        // 设置 Header，要求传入数组
 CustomCurl::setConf('sendCookies', 'a=b; b=c');               // 设置 Cookies，要求传入一维数组或者字符串
 CustomCurl::setConf('autoRefer', 1);                          // CURLOPT_AUTOREFERER，默认值 True
-CustomCurl::setConf('postType', 'json');                      // 提交方式，可选 ['form', 'json', 'string']，默认值 Form
+CustomCurl::setConf('postType', 'json');                      // 提交方式，可选 ['form', 'json', 'string']，默认值 'form'
 CustomCurl::setConf('proxy', '127.0.0.1');                    // 代理
 CustomCurl::setConf('proxyPort', 8080);                       // 代理端口
 CustomCurl::setConf('proxyUserPwd', '[username]:[password]'); // 代理用户名密码
@@ -236,6 +254,54 @@ if ($curlObj3->getStatus()) {
     var_dump($curlObj3->getCurlErrNo());
 }
 ```
+
+### 设置全局 CurlOpt 配置项
+
+```php
+CustomCurl::setCurlOptConf(CURLOPT_SSL_VERIFYPEER, true);   // CURLOPT_SSL_VERIFYPEER，默认值 False
+CustomCurl::setCurlOptConf(CURLOPT_SSL_VERIFYHOST, true);   // CURLOPT_SSL_VERIFYHOST，默认值 False
+CustomCurl::setCurlOptConf(CURLOPT_ENCODING, 'gzip');       // CURLOPT_ENCODING，默认值 ''
+// 以上为所有可修改的全局 CurlOpt 配置项
+
+$curlObj0 = CustomCurl::init('http://lab.imjs.work/server.php')
+            ->setCurlOpt(CURLOPT_ENCODING, '') // 在当前会话中覆盖预设值
+            ->exec();
+
+if ($curlObj0->getStatus()) {
+    var_dump($curlObj0->getHeader(), $curlObj0->getCookies(), $curlObj0->getBody(), $curlObj0->getInfo());
+} else {
+    var_dump($curlObj0->getCurlErrNo());
+}
+
+$curlObj1 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
+
+if ($curlObj1->getStatus()) {
+    var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
+} else {
+    var_dump($curlObj1->getCurlErrNo());
+}
+
+CustomCurl::resetCurlOptConf(CURLOPT_ENCODING); // 恢复 CURLOPT_ENCODING 为默认值
+
+$curlObj2 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
+
+if ($curlObj2->getStatus()) {
+    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
+} else {
+    var_dump($curlObj2->getCurlErrNo());
+}
+
+CustomCurl::resetCurlOptConf(); // 恢复全部 CurlOpt 配置为默认值
+
+$curlObj3 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
+
+if ($curlObj3->getStatus()) {
+    var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());
+} else {
+    var_dump($curlObj3->getCurlErrNo());
+}
+```
+
 
 ## 版权信息
 
