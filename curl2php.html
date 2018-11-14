@@ -692,7 +692,8 @@
                 "#":  ["progress-bar",             1],
                 ":":  ["next",                     0],
             },
-            userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36';
+            userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36',
+            tmpUserAgent;
 
         var lnameLetter = {};
 
@@ -710,6 +711,7 @@
         var convertCurl = function() {
             renderToCodeDom('', true);
             var commands = parseCommand(bashCodeEditor.getValue()), hasCommand = false;
+            tmpUserAgent = userAgent;
             for (var i = 0; i < commands.length; i++) {
                 if (commands[i].length) {
                     hasCommand = true;
@@ -886,9 +888,9 @@
             for (var i in headers) {
                 switch (i.toLowerCase()) {
                     case 'user-agent':
-                        if (headers[i] !== userAgent) {
+                        if (headers[i] !== tmpUserAgent) {
                             op = "CustomCurl::setConf('userAgent', '" + headers[i].replace('\'', '\\\'') + "');\n\n" + op;
-                            userAgent = headers[i];
+                            tmpUserAgent = headers[i];
                         }
                         // op += "                ->set('userAgent', '" + headers[i] + "')\n";
                         break;
