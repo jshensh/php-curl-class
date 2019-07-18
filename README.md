@@ -52,7 +52,7 @@ if ($curlObj->getStatus()) {
 ### POST 上传文件
 
 ```php
-$curlObj = CustomCurl::init('http://127.0.0.1/example_server.php', 'post')
+$curlObj = CustomCurl::init('http://127.0.0.1/examples/example_server.php', 'post')
             ->set('postFields', [
                 'fname'    => 'jshensh',
                 'files[0]' => new CURLFile('./README.md'),
