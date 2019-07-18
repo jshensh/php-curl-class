@@ -8,6 +8,7 @@ Custom Curl (嗯懒得取名字)
 - [使用示例](#使用示例)
     - [GET 方法](#get-方法)
     - [POST 方法](#post-方法)
+    - [POST 上传文件](#post-上传文件)
     - [PUT 方法](#put-方法传输-json-数据)
     - [Cookie 字符串/数组](#cookie-字符串数组)
     - [Header](#header)
@@ -39,6 +40,25 @@ if ($curlObj->getStatus()) {
 ```php
 $curlObj = CustomCurl::init('http://www.w3school.com.cn/example/php/demo_php_global_post.php', 'post')
             ->set('postFields', ['fname' => 'jshensh'])
+            ->exec();
+
+if ($curlObj->getStatus()) {
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+} else {
+    var_dump($curlObj->getCurlErrNo());
+}
+```
+
+### POST 上传文件
+
+```php
+$curlObj = CustomCurl::init('http://127.0.0.1/example_server.php', 'post')
+            ->set('postFields', [
+                'fname'    => 'jshensh',
+                'files[0]' => new CURLFile('./README.md'),
+                'files[1]' => new CURLFile('LICENSE')
+            ])
+            ->set('postFieldsBuildQuery', false)    // postFieldsBuildQuery 设置为 True 时，将对 postFields 进行 http_build_query，避免出现跨语言无法 POST 数据的问题。如需上传文件则需要将该项设置为 False。
             ->exec();
 
 if ($curlObj->getStatus()) {

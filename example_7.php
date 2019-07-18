@@ -1,10 +1,10 @@
 <?php
 require('customCurl.php');
 
-$curlObj = CustomCurl::init('http://example.com')
-            ->setCurlOpt(CURLOPT_SSL_VERIFYPEER, true)  // CURLOPT_SSL_VERIFYPEER，默认值 False
-            ->setCurlOpt(CURLOPT_SSL_VERIFYHOST, true)  // CURLOPT_SSL_VERIFYHOST，默认值 False
-            ->setCurlOpt(CURLOPT_ENCODING, '')          // CURLOPT_ENCODING，默认值 ''
+$curlObj = CustomCurl::init('http://127.0.0.1/example_server.php')
+            ->setHeader('X-PJAX', 'true')                         // 设置 Header，Key => Value
+            ->clearHeaders()                                      // 清空之前设置的所有 Header
+            ->setHeader('X-Requested-With', 'XMLHttpRequest')     // 设置 Header，Key => Value
             ->exec();
 
 if ($curlObj->getStatus()) {

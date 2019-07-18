@@ -1,7 +1,7 @@
 <?php
 require('customCurl.php');
 
-$curlSet1 = CustomCurl::init('http://lab.imjs.work/server.php')
+$curlSet1 = CustomCurl::init('http://127.0.0.1/example_server.php')
                 ->set('referer', 'http://google.com');
 
 $curlSet2 = clone $curlSet1;

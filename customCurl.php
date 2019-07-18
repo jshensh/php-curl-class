@@ -150,21 +150,22 @@ class CustomCurlStatement extends CustomCurlCommon
 class CustomCurl extends CustomCurlCommon
 {
     private static $defaultConf = [
-                'timeout'         => 5,
-                'reRequest'       => 3,
-                'maxRedirs'       => 3,
-                'ignoreCurlError' => false,
-                'followLocation'  => false,
-                'referer'         => '',
-                'userAgent'       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36',
-                'customHeader'    => [],
-                'sendCookies'     => [],
-                'autoRefer'       => 1,
-                'postType'        => 'form',
-                'proxy'           => '',
-                'proxyPort'       => 8080,
-                'proxyUserPwd'    => '',
-                'proxyType'       => CURLPROXY_HTTP
+                'timeout'              => 5,
+                'reRequest'            => 3,
+                'maxRedirs'            => 3,
+                'ignoreCurlError'      => false,
+                'followLocation'       => false,
+                'referer'              => '',
+                'userAgent'            => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36',
+                'customHeader'         => [],
+                'sendCookies'          => [],
+                'autoRefer'            => 1,
+                'postType'             => 'form',
+                'proxy'                => '',
+                'proxyPort'            => 8080,
+                'proxyUserPwd'         => '',
+                'proxyType'            => CURLPROXY_HTTP,
+                'postFieldsBuildQuery' => true
             ],
             $defaultCurlopt = [
                 CURLOPT_SSL_VERIFYPEER => false,
@@ -342,6 +343,8 @@ class CustomCurl extends CustomCurlCommon
             case 'proxyType':
                 // no break
             case 'userAgent':
+                // no break
+            case 'postFieldsBuildQuery':
                 break;
             default:
                 return $this;
@@ -483,7 +486,7 @@ class CustomCurl extends CustomCurlCommon
                 $this->conf['customHeader'][] = 'Content-Length: ' . strlen($postJsonData);
             } else if ($this->conf['postType'] === 'form') {
                 if (is_array($this->conf['postFields'])) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($this->conf['postFields']));
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $this->conf['postFieldsBuildQuery'] ? http_build_query($this->conf['postFields']) : $this->conf['postFields']);
                 }
             } else {
                 if (is_string($this->conf['postFields'])) {
