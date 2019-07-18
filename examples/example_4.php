@@ -1,8 +1,9 @@
 <?php
-require('customCurl.php');
+require('../customCurl.php');
 
-$curlObj = CustomCurl::init('http://www.w3school.com.cn/example/php/demo_php_global_post.php', 'post')
+$curlObj = CustomCurl::init('http://127.0.0.1/examples/example_server.php', 'put')
             ->set('postFields', ['fname' => 'jshensh'])
+            ->set('postType', 'json')
             ->exec();
 
 if ($curlObj->getStatus()) {

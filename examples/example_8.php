@@ -1,5 +1,5 @@
 <?php
-require('customCurl.php');
+require('../customCurl.php');
 
 $curlObj = CustomCurl::init('http://example.com')
             ->setCurlOpt(CURLOPT_SSL_VERIFYPEER, true)  // CURLOPT_SSL_VERIFYPEER，默认值 False

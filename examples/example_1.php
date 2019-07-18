@@ -1,5 +1,5 @@
 <?php
-require('customCurl.php');
+require('../customCurl.php');
 
 $curlObj = CustomCurl::init('http://cn.bing.com/search?q=php')->exec();
 

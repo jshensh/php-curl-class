@@ -1,5 +1,5 @@
 <?php
-require('customCurl.php');
+require('../customCurl.php');
 
 CustomCurl::setConf('timeout', 3);
 CustomCurl::setConf('reRequest', 1);
@@ -18,7 +18,7 @@ CustomCurl::setConf('proxyUserPwd', '');
 CustomCurl::setConf('proxyType', '');
 CustomCurl::setConf('postFieldsBuildQuery', false);
 
-$curlObj0 = CustomCurl::init('http://127.0.0.1/example_server.php')
+$curlObj0 = CustomCurl::init('http://127.0.0.1/examples/example_server.php')
                 ->set('userAgent', 'Test')
                 ->exec();
 
@@ -28,7 +28,7 @@ if ($curlObj0->getStatus()) {
     var_dump($curlObj0->getCurlErrNo());
 }
 
-$curlObj1 = CustomCurl::init('http://127.0.0.1/example_server.php')->exec();
+$curlObj1 = CustomCurl::init('http://127.0.0.1/examples/example_server.php')->exec();
 
 if ($curlObj1->getStatus()) {
     var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
@@ -38,7 +38,7 @@ if ($curlObj1->getStatus()) {
 
 CustomCurl::resetConf('userAgent');
 
-$curlObj2 = CustomCurl::init('http://127.0.0.1/example_server.php')->exec();
+$curlObj2 = CustomCurl::init('http://127.0.0.1/examples/example_server.php')->exec();
 
 if ($curlObj2->getStatus()) {
     var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
@@ -48,7 +48,7 @@ if ($curlObj2->getStatus()) {
 
 CustomCurl::resetConf();
 
-$curlObj3 = CustomCurl::init('http://127.0.0.1/example_server.php')->exec();
+$curlObj3 = CustomCurl::init('http://127.0.0.1/examples/example_server.php')->exec();
 
 if ($curlObj3->getStatus()) {
     var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());
