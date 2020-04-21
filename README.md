@@ -72,7 +72,8 @@ if ($curlObj->getStatus()) {
 
 ```php
 $curlObj = CustomCurl::init('http://lab.imjs.work/server.php', 'put')
-            ->set('postFields', ['fname' => 'jshensh'])
+            ->set('postFields', ['fname' => 'jshensh']) // 可以传入数组
+            ->set('postFields', '{"fname": "jshensh"}') // 也可以直接传入 json 字符串
             ->set('postType', 'json')
             ->exec();
 

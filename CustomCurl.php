@@ -480,7 +480,11 @@ class CustomCurl extends CustomCurlCommon
         }
         if (in_array($this->method, ['post', 'put'])) {
             if ($this->conf['postType'] === 'json') {
-                $postJsonData = json_encode($this->conf['postFields']);
+                if (is_string($this->conf['postFields'])) {
+                    $postJsonData = $this->conf['postFields'];
+                } else {
+                    $postJsonData = json_encode($this->conf['postFields']);
+                }
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $postJsonData);
                 $this->conf['customHeader'][] = 'Content-Type: application/json';
                 $this->conf['customHeader'][] = 'Content-Length: ' . strlen($postJsonData);
