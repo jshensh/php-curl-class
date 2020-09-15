@@ -96,7 +96,7 @@ $curlObj = CustomCurl::init('http://example.com')
             ->exec();
 
 if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo(), $cookieJar);
 } else {
     var_dump($curlObj->getCurlErrNo());
 }
