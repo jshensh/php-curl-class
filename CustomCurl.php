@@ -2,16 +2,16 @@
 // +----------------------------------------------------------------------
 // | Custom Curl
 // +----------------------------------------------------------------------
-// | Copyright (c) 2018 http://233.imjs.work All rights reserved.
+// | Copyright (c) 2020 http://233.imjs.work All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( https://www.gnu.org/licenses/gpl-3.0.html )
 // +----------------------------------------------------------------------
-// | Author: jshensh <jshensh@126.com>
+// | Author: jshensh <admin@imjs.work>
 // +----------------------------------------------------------------------
 
 /**
  * Custom Curl 通用工具类
- * @author  jshensh <jshensh@126.com>
+ * @author  jshensh <admin@imjs.work>
  */
 class CustomCurlCommon
 {
@@ -38,11 +38,26 @@ class CustomCurlCommon
         }
         return $op;
     }
+
+    /**
+     * 将 CustomCurlCommon::parseCookie 返回的 Cookies 数组转为 Key Value 格式
+     * @access protected
+     * @param array $cookies Cookies 数组
+     * @return array
+     */
+    protected static function mapRecvCookies($cookies) 
+    {
+        $op = [];
+        foreach ($cookies as $cookie) {
+            $op[key($cookie)] = current($cookie);
+        }
+        return $op;
+    }
 }
 
 /**
  * Custom Curl 结果类
- * @author  jshensh <jshensh@126.com>
+ * @author  jshensh <admin@imjs.work>
  */
 class CustomCurlStatement extends CustomCurlCommon
 {
@@ -63,7 +78,7 @@ class CustomCurlStatement extends CustomCurlCommon
      * @param string   $output 请求结果
      * @return void
      */
-    public function __construct($curlErrNo, $ch, $output) {
+    public function __construct($curlErrNo, $ch, $output, &$cookieJarObj = []) {
         if ($curlErrNo !== 0) {
             $this->curlErrNo = $curlErrNo;
             return;
@@ -79,6 +94,8 @@ class CustomCurlStatement extends CustomCurlCommon
                 $this->responseCookies[] = self::parseCookie($value);
             }
         }
+        var_dump($cookieJarObj);
+        $cookieJarObj = array_merge($cookieJarObj, self::mapRecvCookies($this->responseCookies));
     }
 
     /**
@@ -126,9 +143,9 @@ class CustomCurlStatement extends CustomCurlCommon
      * @access public
      * @return array
      */
-    public function getCookies()
+    public function getCookies($map = false)
     {
-        return $this->responseCookies;
+        return $map ? self::mapRecvCookies($this->responseCookies) : $this->responseCookies;
     }
 
     /**
@@ -145,7 +162,7 @@ class CustomCurlStatement extends CustomCurlCommon
 
 /**
  * Custom Curl 类
- * @author  jshensh <jshensh@126.com>
+ * @author  jshensh <admin@imjs.work>
  */
 class CustomCurl extends CustomCurlCommon
 {
@@ -180,7 +197,8 @@ class CustomCurl extends CustomCurlCommon
             $conf = [
                 'postFields' => []
             ],
-            $curlopt = [];
+            $curlopt = [],
+            $cookieJarObj = [];
 
     /**
      * 构造方法
@@ -430,7 +448,7 @@ class CustomCurl extends CustomCurlCommon
         $cookies = is_array($parm) ? $parm : self::parseCookie($parm);
         $cookiesC = count($cookies);
 
-        if (!$cookiesC || ($cookiesC !== count($cookies, 1))) {
+        if (!$cookiesC || $cookiesC !== count($cookies, 1)) {
             return $this;
         }
 
@@ -455,6 +473,22 @@ class CustomCurl extends CustomCurlCommon
     }
 
     /**
+     * 设置 Cookie Jar
+     * @access public
+     * @param string|array &$jar Cookie Jar 数组
+     * @return CustomCurl
+     */
+    public function cookieJar(&$jar)
+    {
+        if (!is_array($jar) || count($jar) !== count($jar, 1)) {
+            return $this;
+        }
+
+        $this->cookieJarObj = &$jar;
+        return $this;
+    }
+
+    /**
      * 执行 Curl
      * @access public
      * @return CustomCurlStatement
@@ -472,6 +506,7 @@ class CustomCurl extends CustomCurlCommon
         curl_setopt($ch, CURLOPT_AUTOREFERER, $this->conf['autoRefer']);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($this->method));
         if (count($this->conf['sendCookies'])) {
+            $this->cookieJarObj = $this->conf['sendCookies'];
             $sendCookies = '';
             foreach ($this->conf['sendCookies'] as $key => $value) {
                 $sendCookies .= "{$key}={$value}; ";
@@ -517,7 +552,7 @@ class CustomCurl extends CustomCurlCommon
         $output = curl_exec($ch);
         $curlErrNo = curl_errno($ch);
         if ($curlErrNo === 0 || ($this->conf['ignoreCurlError'] && $output)) {
-            return new CustomCurlStatement(0, $ch, $output);
+            return new CustomCurlStatement(0, $ch, $output, $this->cookieJarObj);
         }
         $this->conf['reRequest']--;
         if ($this->conf['reRequest'] > 0) {

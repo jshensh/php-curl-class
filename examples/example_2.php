@@ -1,5 +1,5 @@
 <?php
-require('../customCurl.php');
+require('../CustomCurl.php');
 
 $curlObj = CustomCurl::init('http://www.w3school.com.cn/example/php/demo_php_global_post.php', 'post')
             ->set('postFields', ['fname' => 'jshensh']) // 可以传入数组

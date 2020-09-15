@@ -1,5 +1,5 @@
 <?php
-require('../customCurl.php');
+require('../CustomCurl.php');
 
 CustomCurl::setCurlOptConf(CURLOPT_SSL_VERIFYPEER, true);   // CURLOPT_SSL_VERIFYPEER，默认值 False
 CustomCurl::setCurlOptConf(CURLOPT_SSL_VERIFYHOST, true);   // CURLOPT_SSL_VERIFYHOST，默认值 False

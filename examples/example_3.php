@@ -1,5 +1,5 @@
 <?php
-require('../customCurl.php');
+require('../CustomCurl.php');
 
 $curlObj = CustomCurl::init('http://127.0.0.1/examples/example_server.php', 'post')
             ->set('postFields', [

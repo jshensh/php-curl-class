@@ -1,5 +1,5 @@
 <?php
-require('../customCurl.php');
+require('../CustomCurl.php');
 
 CustomCurl::setConf('timeout', 3);
 CustomCurl::setConf('reRequest', 1);
