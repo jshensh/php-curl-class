@@ -283,6 +283,8 @@
                 TOKEN += (Math.pow(16,8)*Math.random()).toString(16);
             }
 
+            command = command.replace(/\\\n/g, '');
+
             var commandArgus = (function (s, env) {
                 var chunker = new RegExp([
                     '(' + CONTROL + ')', // control chars
