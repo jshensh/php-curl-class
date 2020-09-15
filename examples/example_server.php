@@ -1,6 +1,6 @@
 <?php
     setcookie('server', 'test');
-    setcookie('b', 'b');
+    setcookie('b', 'b', 1);
     $serv=$_SERVER;
     unset($serv["SCRIPT_FILENAME"]);
     unset($serv["CONTEXT_DOCUMENT_ROOT"]);

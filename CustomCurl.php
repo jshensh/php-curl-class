@@ -40,18 +40,22 @@ class CustomCurlCommon
     }
 
     /**
-     * 将 CustomCurlCommon::parseCookie 返回的 Cookies 数组转为 Key Value 格式
+     * 合并服务器返回的 Cookies 至 Cookie Jar 数组
      * @access protected
+     * @param array $jar Cookie Jar 数组
      * @param array $cookies Cookies 数组
      * @return array
      */
-    protected static function mapRecvCookies($cookies) 
+    protected static function mergeCookieJar($jar, $cookies) 
     {
-        $op = [];
         foreach ($cookies as $cookie) {
-            $op[key($cookie)] = current($cookie);
+            if (isset($cookie['expires']) && strtotime($cookie['expires']) - time() <= 0 && isset($jar[key($cookie)])) {
+                unset($jar[key($cookie)]);
+            } else {
+                $jar[key($cookie)] = current($cookie);
+            }
         }
-        return $op;
+        return $jar;
     }
 }
 
@@ -76,6 +80,7 @@ class CustomCurlStatement extends CustomCurlCommon
      * @param int      $curlErrNo Curl 错误码
      * @param resource $ch Curl 句柄
      * @param string   $output 请求结果
+     * @param array    &$cookieJarObj Cookie Jar 数组
      * @return void
      */
     public function __construct($curlErrNo, $ch, $output, &$cookieJarObj = []) {
@@ -94,8 +99,7 @@ class CustomCurlStatement extends CustomCurlCommon
                 $this->responseCookies[] = self::parseCookie($value);
             }
         }
-        var_dump($cookieJarObj);
-        $cookieJarObj = array_merge($cookieJarObj, self::mapRecvCookies($this->responseCookies));
+        $cookieJarObj = self::mergeCookieJar($cookieJarObj, $this->responseCookies);
     }
 
     /**
@@ -143,9 +147,9 @@ class CustomCurlStatement extends CustomCurlCommon
      * @access public
      * @return array
      */
-    public function getCookies($map = false)
+    public function getCookies()
     {
-        return $map ? self::mapRecvCookies($this->responseCookies) : $this->responseCookies;
+        return $this->responseCookies;
     }
 
     /**
@@ -475,7 +479,7 @@ class CustomCurl extends CustomCurlCommon
     /**
      * 设置 Cookie Jar
      * @access public
-     * @param string|array &$jar Cookie Jar 数组
+     * @param array &$jar Cookie Jar 数组
      * @return CustomCurl
      */
     public function cookieJar(&$jar)
