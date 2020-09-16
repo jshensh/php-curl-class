@@ -489,7 +489,7 @@ class CustomCurl extends CustomCurlCommon
         }
 
         $this->cookieJarObj = &$jar;
-        return $this;
+        return $this->setCookies($this->cookieJarObj, true);
     }
 
     /**
