@@ -741,7 +741,8 @@
                 method = 'get',
                 cookies = [],
                 timeout = 5,
-                postJson = false;
+                postJson = false,
+                postForm = false;
 
             var getParameter = function(flag, nextArg) {
                 var usedArg = false;
@@ -781,7 +782,11 @@
                     case 'dr':
                     case 'da':
                     case 'db':
-                        postFields = nextArg;
+                        if (letter === 'dr' && (postJson || postForm)) {
+                            Object.assign(postFields, parseStr(nextArg));
+                        } else {
+                            postFields = nextArg;
+                        }
                         method = method === 'get' ? 'post' : method;
                         usedArg = true;
                         break;
@@ -806,6 +811,8 @@
                                 case 'content-type':
                                     if (header[2].indexOf("json") > -1) {
                                         postJson = true;
+                                    } else if (header[2].indexOf("www-form-urlencoded") > -1) {
+                                        postForm = true;
                                     } else {
                                         headers[header[1]] = header[2];
                                     }
