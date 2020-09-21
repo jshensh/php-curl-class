@@ -7,8 +7,8 @@ $curlObj = CustomCurl::init('http://example.com')
             ->setCurlOpt(CURLOPT_ENCODING, '')          // CURLOPT_ENCODING，默认值 ''
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());

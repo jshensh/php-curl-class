@@ -9,14 +9,14 @@ $curlSet2 = clone $curlSet1;
 $curlObj1 = $curlSet1->setHeader('X-PJAX', 'true')->exec();
 $curlObj2 = $curlSet2->setHeader('X-Requested-With', 'XMLHttpRequest')->exec();
 
-if ($curlObj1->getStatus()) {
-    var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody());
-} else {
-    var_dump($curlObj1->getCurlErrNo());
+if (!$curlObj1->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj1->getCurlErrNo());
 }
 
-if ($curlObj2->getStatus()) {
-    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
-} else {
-    var_dump($curlObj2->getCurlErrNo());
+var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
+
+if (!$curlObj2->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj2->getCurlErrNo());
 }
+
+var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());

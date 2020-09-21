@@ -42,11 +42,11 @@ $curlObj = CustomCurl::init('http://www.w3school.com.cn/example/php/demo_php_glo
             ->set('postFields', ['fname' => 'jshensh'])
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ### POST 上传文件
@@ -61,11 +61,11 @@ $curlObj = CustomCurl::init('http://127.0.0.1/examples/example_server.php', 'pos
             ->set('postFieldsBuildQuery', false)    // postFieldsBuildQuery 设置为 True 时，将对 postFields 进行 http_build_query，避免出现跨语言无法 POST 数据的问题。如需上传文件则需要将该项设置为 False。
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ### PUT 方法，传输 JSON 数据
@@ -77,11 +77,11 @@ $curlObj = CustomCurl::init('http://lab.imjs.work/server.php', 'put')
             ->set('postType', 'json')
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ### 手动设置 Cookie
@@ -95,11 +95,11 @@ $curlObj = CustomCurl::init('http://example.com')
             ->setCookie('b', 'c')     // 重新设置 Cookie，Key => Value
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo(), $cookieJar);
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ### Cookie 字符串/数组
@@ -114,11 +114,11 @@ $curlObj = CustomCurl::init('http://example.com')
             ->setCookies('dsjdhs')            // 传入不合法字符串将忽略
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ### Header
@@ -130,11 +130,11 @@ $curlObj = CustomCurl::init('http://example.com/api')
             ->setHeader('X-Requested-With', 'XMLHttpRequest')     // 设置 Header，Key => Value
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ### 自定义 CurlOpt
@@ -146,11 +146,11 @@ $curlObj = CustomCurl::init('http://example.com')
             ->setCurlOpt(CURLOPT_ENCODING, '')          // CURLOPT_ENCODING，默认值 ''
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ## 设置项
@@ -169,11 +169,11 @@ $curlObj = CustomCurl::init('http://cn.bing.com')
             ->set('userAgent', 'Mozilla')               // CURLOPT_USERAGENT
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ## 杂项
@@ -189,17 +189,17 @@ $curlObj2 = clone $curlObj1;
 $curlObj1 = $curlObj1->setHeader('X-PJAX', 'true')->exec();
 $curlObj2 = $curlObj2->setHeader('X-Requested-With', 'XMLHttpRequest')->exec();
 
-if ($curlObj1->getStatus()) {
-    var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj1->getCurlErrNo());
+if (!$curlObj1->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj1->getCurlErrNo());
 }
 
-if ($curlObj2->getStatus()) {
-    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj2->getCurlErrNo());
+var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
+
+if (!$curlObj2->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj2->getCurlErrNo());
 }
+
+var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
 ```
 
 ### 代理
@@ -212,11 +212,11 @@ $curlObj = CustomCurl::init('http://example.com')
             ->set('proxyType', CURLPROXY_HTTP)             // 代理类型，可选 [CURLPROXY_HTTP, CURLPROXY_SOCKS4, CURLPROXY_SOCKS5, CURLPROXY_SOCKS4A, CURLPROXY_SOCKS5_HOSTNAME]，默认 CURLPROXY_HTTP，传入常量，不要加引号
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 ```
 
 ### 设置全局配置
@@ -239,43 +239,43 @@ CustomCurl::setConf('proxyUserPwd', '[username]:[password]'); // 代理用户名
 CustomCurl::setConf('proxyType', CURLPROXY_HTTP);             // 代理方式
 // 以上为所有可修改的全局配置项
 
-$curlObj0 = CustomCurl::init('http://lab.imjs.work/server.php')
+$curlObj = CustomCurl::init('http://lab.imjs.work/server.php')
             ->set('userAgent', 'Test') // 在当前会话中覆盖预设值
             ->exec();
 
-if ($curlObj0->getStatus()) {
-    var_dump($curlObj0->getHeader(), $curlObj0->getCookies(), $curlObj0->getBody(), $curlObj0->getInfo());
-} else {
-    var_dump($curlObj0->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 
 $curlObj1 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
 
-if ($curlObj1->getStatus()) {
-    var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
-} else {
-    var_dump($curlObj1->getCurlErrNo());
+if (!$curlObj1->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj1->getCurlErrNo());
 }
+
+var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
 
 CustomCurl::resetConf('userAgent'); // 恢复 userAgent 参数为默认值
 
 $curlObj2 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
 
-if ($curlObj2->getStatus()) {
-    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
-} else {
-    var_dump($curlObj2->getCurlErrNo());
+if (!$curlObj2->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj2->getCurlErrNo());
 }
+
+var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
 
 CustomCurl::resetConf(); // 恢复全部参数为默认值
 
 $curlObj3 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
 
-if ($curlObj3->getStatus()) {
-    var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());
-} else {
-    var_dump($curlObj3->getCurlErrNo());
+if (!$curlObj3->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj3->getCurlErrNo());
 }
+
+var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());
 ```
 
 ### 设置全局 CurlOpt 配置项
@@ -286,43 +286,43 @@ CustomCurl::setCurlOptConf(CURLOPT_SSL_VERIFYHOST, true);   // CURLOPT_SSL_VERIF
 CustomCurl::setCurlOptConf(CURLOPT_ENCODING, 'gzip');       // CURLOPT_ENCODING，默认值 ''
 // 以上为所有可修改的全局 CurlOpt 配置项
 
-$curlObj0 = CustomCurl::init('http://lab.imjs.work/server.php')
+$curlObj = CustomCurl::init('http://lab.imjs.work/server.php')
             ->setCurlOpt(CURLOPT_ENCODING, '') // 在当前会话中覆盖预设值
             ->exec();
 
-if ($curlObj0->getStatus()) {
-    var_dump($curlObj0->getHeader(), $curlObj0->getCookies(), $curlObj0->getBody(), $curlObj0->getInfo());
-} else {
-    var_dump($curlObj0->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 
 $curlObj1 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
 
-if ($curlObj1->getStatus()) {
-    var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
-} else {
-    var_dump($curlObj1->getCurlErrNo());
+if (!$curlObj1->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj1->getCurlErrNo());
 }
+
+var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
 
 CustomCurl::resetCurlOptConf(CURLOPT_ENCODING); // 恢复 CURLOPT_ENCODING 为默认值
 
 $curlObj2 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
 
-if ($curlObj2->getStatus()) {
-    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
-} else {
-    var_dump($curlObj2->getCurlErrNo());
+if (!$curlObj2->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj2->getCurlErrNo());
 }
+
+var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
 
 CustomCurl::resetCurlOptConf(); // 恢复全部 CurlOpt 配置为默认值
 
 $curlObj3 = CustomCurl::init('http://lab.imjs.work/server.php')->exec();
 
-if ($curlObj3->getStatus()) {
-    var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());
-} else {
-    var_dump($curlObj3->getCurlErrNo());
+if (!$curlObj3->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj3->getCurlErrNo());
 }
+
+var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());
 ```
 
 

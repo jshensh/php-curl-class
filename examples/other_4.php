@@ -18,28 +18,28 @@ if ($curlObj0->getStatus()) {
 
 $curlObj1 = CustomCurl::init('http://127.0.0.1/examples/example_server.php')->exec();
 
-if ($curlObj1->getStatus()) {
-    var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
-} else {
-    var_dump($curlObj1->getCurlErrNo());
+if (!$curlObj1->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj1->getCurlErrNo());
 }
+
+var_dump($curlObj1->getHeader(), $curlObj1->getCookies(), $curlObj1->getBody(), $curlObj1->getInfo());
 
 CustomCurl::resetCurlOptConf(CURLOPT_ENCODING); // 恢复 CURLOPT_ENCODING 为默认值
 
 $curlObj2 = CustomCurl::init('http://127.0.0.1/examples/example_server.php')->exec();
 
-if ($curlObj2->getStatus()) {
-    var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
-} else {
-    var_dump($curlObj2->getCurlErrNo());
+if (!$curlObj2->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj2->getCurlErrNo());
 }
+
+var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), $curlObj2->getInfo());
 
 CustomCurl::resetCurlOptConf(); // 恢复全部 CurlOpt 配置为默认值
 
 $curlObj3 = CustomCurl::init('http://127.0.0.1/examples/example_server.php')->exec();
 
-if ($curlObj3->getStatus()) {
-    var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());
-} else {
-    var_dump($curlObj3->getCurlErrNo());
+if (!$curlObj3->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj3->getCurlErrNo());
 }
+
+var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());

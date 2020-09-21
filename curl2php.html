@@ -959,7 +959,15 @@
                 op += "                ->set('postFields', \"" + postFields.replace(/"/g, '\\"') + "\")\n";
             }
 
-            renderToCodeDom(op + "                ->exec();\n\nif ($curlObj" + requestI + "->getStatus()) {\n    var_dump($curlObj" + requestI + "->getHeader(), $curlObj" + requestI + "->getCookies(), $curlObj" + requestI + "->getBody(), $curlObj" + requestI + "->getInfo());\n} else {\n    var_dump($curlObj" + requestI + "->getCurlErrNo());\n}\n\n");
+            renderToCodeDom(op + "\
+                ->exec();\n\
+\n\
+if (!$curlObj" + requestI + "->getStatus()) {\n\
+    throw new \\Exception('Curl Error', $curlObj" + requestI + "->getCurlErrNo());\n\
+}\n\
+\n\
+var_dump($curlObj" + requestI + "->getHeader(), $curlObj" + requestI + "->getCookies(), $curlObj" + requestI + "->getBody(), $curlObj" + requestI + "->getInfo());\n\
+\n");
         };
     </script>
 </html>

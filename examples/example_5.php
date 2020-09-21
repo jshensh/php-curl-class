@@ -10,8 +10,8 @@ $curlObj = CustomCurl::init('http://127.0.0.1/examples/example_server.php')
             ->setCookie('b', 'c')     // 重新设置 Cookie，Key => Value
             ->exec();
 
-if ($curlObj->getStatus()) {
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo(), $cookieJar);
-} else {
-    var_dump($curlObj->getCurlErrNo());
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
 }
+
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
