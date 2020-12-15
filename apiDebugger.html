@@ -267,7 +267,7 @@
                     var xhr = jQuery.ajaxSettings.xhr();
                     var setRequestHeader = xhr.setRequestHeader;
                     xhr.setRequestHeader = function(name, value) {
-                        var force = (typeof arguments[2] === 'undefined' || !arguments[2]) ? false : true;
+                        var force = (typeof value['force'] === 'undefined') ? false : value['force'];
                         if (name === 'X-Requested-With' && !force) return;
                         setRequestHeader.call(this, name, value);
                     }
@@ -285,6 +285,7 @@
                         return false;
                     }
                     var data = JSON.parse(xhr.responseText);
+                    console.log($('#token'));
                     $('#token').text(data['access_token']);
                 }
             });
