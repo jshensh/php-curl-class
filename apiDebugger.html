@@ -43,6 +43,12 @@
                     <hr />
                     <form class="form-horizontal">
                         <div class="form-group">
+                            <label for="apiUrl" class="col-sm-2 control-label">Api List</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="apiList" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="apiUrl" class="col-sm-2 control-label">Api Url</label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="apiUrl" placeholder="https://">
@@ -54,6 +60,7 @@
                                 <select class="form-control" id="method" style="width: 100%;">
                                     <option value="GET">GET</option>
                                     <option value="POST" selected="selected">POST</option>
+                                    <option value="PATCH">PATCH</option>
                                     <option value="PUT">PUT</option>
                                     <option value="DELETE">DELETE</option>
                                     <option value="OPTIONS">OPTIONS</option>
@@ -80,7 +87,7 @@
 
                     <div id="stringContainer" style="display: none;">
                         <div class="form-group">
-                            <textarea class="form-control" id="stringToPost" placeholder="JSON / XML / URL Encoded String Here"></textarea>
+                            <textarea class="form-control" id="stringToPost" placeholder="JSON / XML / URL Encoded String Here" rows="10"></textarea>
                         </div>
                     </div>
 
@@ -267,7 +274,7 @@
                     var xhr = jQuery.ajaxSettings.xhr();
                     var setRequestHeader = xhr.setRequestHeader;
                     xhr.setRequestHeader = function(name, value) {
-                        var force = (typeof arguments[2] === 'undefined' || !arguments[2]) ? false : true;
+                        var force = (typeof value['force'] === 'undefined') ? false : value['force'];
                         if (name === 'X-Requested-With' && !force) return;
                         setRequestHeader.call(this, name, value);
                     }
@@ -275,9 +282,10 @@
                 },
                 beforeSend: function(xhr) {
                     $(formDom).find('input[type="submit"]').attr('disabled', 'disabled');
-                    $('#token').text('');
+                    $('#token').val('');
                 },
                 complete: function(xhr, status) {
+                    console.log(xhr, status, formDom)
                     $(formDom).find('input[type="submit"]').removeAttr('disabled');
                     var list = xhr.getAllResponseHeaders();
                     if (status === 'error') {
@@ -285,7 +293,7 @@
                         return false;
                     }
                     var data = JSON.parse(xhr.responseText);
-                    $('#token').text(data['access_token']);
+                    $('#token').val(data['access_token']);
                 }
             });
         };
@@ -305,13 +313,28 @@
                 $('#paramsContainer').find(`input[id$="${uuid[2]}_value"]`).attr('name', paramKeyInputs[i].value);
             }
 
-            var stringData = $('#stringToPost').val();
+            var requestData = (function() {
+                switch ($('#method').val()) {
+                    case 'GET':
+                    case 'DELETE':
+                    case 'OPTIONS':
+                        return $('#paramsContainer').serialize();
+                    default:
+                        switch ($('#header_content_type_value').val()) {
+                            case '':
+                            case 'application/x-www-form-urlencoded':
+                                return new FormData($('#paramsContainer')[0]);
+                            default:
+                                return $('#stringToPost').val();
+                        }
+                }
+            })();
 
             $.ajax({
                 url: $('#apiUrl').val(),
                 type: $('#method').val(),
                 cache: false,
-                data: stringData ? stringData : new FormData($('#paramsContainer')[0]),
+                data: requestData,
                 processData: false,
                 contentType: false,
                 xhr: function() {
@@ -393,7 +416,6 @@
             });
 
             var baseHeight = window.innerHeight < document.getElementById('leftPanel').offsetHeight ? (document.getElementById('leftPanel').offsetHeight + 76) : window.innerHeight;
-            console.log(window.innerHeight, document.getElementById('leftPanel').offsetHeight);
             var size = (baseHeight - 150 < 0 ? 300 : (baseHeight - 150) / 3);
             responseHeaderCodeEditor.setSize(null, size + 'px');
             responseBodyCodeEditor.setSize(null, (size * 2) + 'px');
@@ -516,7 +538,92 @@
                 }
             }).select2({
                 tags: true
-            })
+            });
+
+            var apiList = {};
+
+            var changeApi = function(api) {
+                $('#headersContainer').find(`a`).trigger('click');
+                for (var i in api['headers']) {
+                    if (i === 'Content-Type') {
+                        $('#header_content_type_value').val(api['headers'][i]).trigger('change');
+                        continue;
+                    }
+                    $('#headersContainer').append(inputDomRender('header', 'text', {'key': i, 'value': api['headers'][i]}));
+                }
+                $('#headersContainer').append(inputDomRender('header', 'text', {'key': 'X-Requested-With', 'value': 'XMLHttpRequest'}));
+                $('#headersContainer').append(inputDomRender('header', 'text'));
+
+                $('#method').val(api['method']).change();
+
+                if (typeof api['headers']['Content-Type'] !== 'undefined') {
+                    switch (api['headers']['Content-Type']) {
+                        case '':
+                        case 'application/x-www-form-urlencoded':
+                            $('#stringToPost').val('');
+                            $('#stringContainer').hide();
+                            $('#paramsContainer').show();
+                            $('#addParamButton').show();
+                            $('#addFileButton').show();
+
+                            $('#paramsContainer').find(`a`).trigger('click');
+                            for (var i in api['params']) {
+                                $('#paramsContainer').append(inputDomRender('param', 'text', {'key': i, 'value': api['params'][i]}));
+                            }
+                            $('#paramsContainer').append(inputDomRender('param', 'text'));
+
+                            break;
+                        default:
+                            $('#stringToPost').val(JSON.stringify(api['params']));
+                            $('#stringContainer').show();
+                            $('#paramsContainer').hide();
+                            $('#addParamButton').hide();
+                            $('#addFileButton').hide();
+                            break;
+                    }
+                }
+
+                $('#apiUrl').val(api['url']);
+            };
+
+            var formatApi = function (api) {
+                if (api.loading) {
+                    return api.text;
+                }
+
+                return api.name;
+            };
+
+            var formatApiSelection = function (api) {
+                return api.name || api.text;
+            };
+
+            $('#apiList').select2({
+                ajax: {
+                    url: function (params) {
+                        return '/apilist';
+                    },
+                    data: function (params) {
+                        return {
+                            search: params.term
+                        };
+                    },
+                    processResults: function (data, params) {
+                        return {
+                            results: data,
+                        };
+                    },
+                    cache: false
+                },
+                placeholder: 'Search for a api',
+                templateResult: formatApi,
+                templateSelection: formatApiSelection
+            });
+
+            $('#apiList').on('select2:select', function (e) {
+                var data = e.params.data;
+                changeApi(data);
+            });
         });
     </script>
 </html>
