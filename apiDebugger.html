@@ -19,19 +19,19 @@
     <body>
         <div class="contianer" style="margin: 20px;">
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-4 col-lg-3" id="leftPanel">
                     <form onsubmit="loginApi(this); return false;">
                         <div class="form-group">
                             <label for="loginUrl">Login URL</label>
-                            <input type="text" class="form-control" id="loginUrl" placeholder="https://" value="">
+                            <input type="text" class="form-control" id="loginUrl" placeholder="https://" value="http://20201207.403.lan/api/auth/login">
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="text" class="form-control" name="email" id="email" placeholder="Email" value="">
+                            <input type="text" class="form-control" name="email" id="email" placeholder="Email" value="admin@admin.com">
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input type="password" class="form-control" name="password" id="password" placeholder="Password" value="">
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Password" value="password">
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">Flush Token</button>
@@ -64,7 +64,7 @@
                     <label>Headers</label>
                     <form class="form-horizontal" id="headersContainer">
                         <div class="form-group" id="header_content_type_row">
-                            <label for="header_content_type_value" class="col-sm-3 control-label">Content-Type</label>
+                            <label for="header_content_type_value" class="col-sm-3 control-label" style="font-weight: 400;">Content-Type</label>
                             <div class="col-sm-9">
                                 <select class="form-control" id="header_content_type_value" name="Content-Type" type="text" aria-describedby="header_content_type" style="width: 100%;">
                                     <option value="" selected="selected">Let the browser decide</option>
@@ -91,7 +91,7 @@
                         <button type="submit" class="btn btn-primary" style="margin-bottom: 15px;">Submit</button>
                     </form>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-8 col-lg-9">
                     <label>Response Headers:</label>
                     <div style="border: 1px solid #ddd;">
                         <textarea id="responseHeader" style="width: 100%;" class="file-editor-textarea js-code-textarea"></textarea>
@@ -386,12 +386,15 @@
             });
 
             $(window).resize(function(event) {
-                var size = (window.innerHeight - 150 < 0 ? 300 : (window.innerHeight - 150) / 3);
+                var baseHeight = window.innerHeight < document.getElementById('leftPanel').offsetHeight ? (document.getElementById('leftPanel').offsetHeight + 76) : window.innerHeight;
+                var size = (baseHeight - 150 < 0 ? 300 : (baseHeight - 150) / 3);
                 responseHeaderCodeEditor.setSize(null, size + 'px');
                 responseBodyCodeEditor.setSize(null, (size * 2) + 'px');
             });
 
-            var size = (window.innerHeight - 150 < 0 ? 300 : (window.innerHeight - 150) / 3);
+            var baseHeight = window.innerHeight < document.getElementById('leftPanel').offsetHeight ? (document.getElementById('leftPanel').offsetHeight + 76) : window.innerHeight;
+            console.log(window.innerHeight, document.getElementById('leftPanel').offsetHeight);
+            var size = (baseHeight - 150 < 0 ? 300 : (baseHeight - 150) / 3);
             responseHeaderCodeEditor.setSize(null, size + 'px');
             responseBodyCodeEditor.setSize(null, (size * 2) + 'px');
 
