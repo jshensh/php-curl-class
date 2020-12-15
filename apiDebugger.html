@@ -85,10 +85,8 @@
                     <label>Params</label>
                     <form class="form-horizontal" id="paramsContainer"></form>
 
-                    <div id="stringContainer" style="display: none;">
-                        <div class="form-group">
-                            <textarea class="form-control" id="stringToPost" placeholder="JSON / XML / URL Encoded String Here" rows="10"></textarea>
-                        </div>
+                    <div id="stringContainer" style="border: 1px solid #ddd;" class="form-group">
+                        <textarea class="form-control" id="stringToPost" placeholder="JSON / XML / URL Encoded String Here" rows="10"></textarea>
                     </div>
 
                     <form class="form-horizontal" onsubmit="requestApi(this); return false;">
@@ -260,7 +258,7 @@
     </style>
 
     <script>
-        var responseHeaderCodeEditor, responseBodyCodeEditor;
+        var responseHeaderCodeEditor, responseBodyCodeEditor, requestJsonCodeEditor;
 
         var loginApi = function(formDom) {
             $.ajax({
@@ -325,7 +323,7 @@
                             case 'application/x-www-form-urlencoded':
                                 return new FormData($('#paramsContainer')[0]);
                             default:
-                                return $('#stringToPost').val();
+                                return requestJsonCodeEditor.getValue();
                         }
                 }
             })();
@@ -407,6 +405,19 @@
                 scrollbarStyle: "simple",
                 lineWrapping: true
             });
+
+            requestJsonCodeEditor = CodeMirror.fromTextArea(document.getElementById('stringToPost'), {
+                mode: "javascript",
+                theme: "github-light",
+                matchBrackets: true,
+                lineNumbers: true,
+                indentUnit: 4,
+                scrollbarStyle: "simple",
+                lineWrapping: true
+            });
+
+            requestJsonCodeEditor.setSize(null, '200px');
+            $('#stringContainer').hide();
 
             $(window).resize(function(event) {
                 var baseHeight = window.innerHeight < document.getElementById('leftPanel').offsetHeight ? (document.getElementById('leftPanel').offsetHeight + 76) : window.innerHeight;
@@ -523,7 +534,7 @@
                 switch ($(this).val()) {
                     case '':
                     case 'application/x-www-form-urlencoded':
-                        $('#stringToPost').val('');
+                        requestJsonCodeEditor.setValue('');
                         $('#stringContainer').hide();
                         $('#paramsContainer').show();
                         $('#addParamButton').show();
@@ -560,7 +571,7 @@
                     switch (api['headers']['Content-Type']) {
                         case '':
                         case 'application/x-www-form-urlencoded':
-                            $('#stringToPost').val('');
+                            requestJsonCodeEditor.setValue('');
                             $('#stringContainer').hide();
                             $('#paramsContainer').show();
                             $('#addParamButton').show();
@@ -574,7 +585,7 @@
 
                             break;
                         default:
-                            $('#stringToPost').val(JSON.stringify(api['params']));
+                            requestJsonCodeEditor.setValue(JSON.stringify(api['params'], null, "    "));
                             $('#stringContainer').show();
                             $('#paramsContainer').hide();
                             $('#addParamButton').hide();
