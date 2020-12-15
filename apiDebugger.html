@@ -285,7 +285,6 @@
                         return false;
                     }
                     var data = JSON.parse(xhr.responseText);
-                    console.log($('#token'));
                     $('#token').text(data['access_token']);
                 }
             });
