@@ -330,7 +330,7 @@ var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), 
 
 Custom Curl 遵循 GPL-3.0 开源协议发布，并提供免费使用。
 
-版权所有Copyright © 2018 by jshensh (http://233.imjs.work)
+版权所有 Copyright © 2018 - 2021 by jshensh (http://233.imjs.work)
 
 All rights reserved。
 
