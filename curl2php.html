@@ -1,3 +1,4 @@
+
 <html>
     <head>
         <meta charset="utf-8">
@@ -783,7 +784,7 @@
                     case 'da':
                     case 'db':
                         if (letter === 'dr' && (postJson || postForm)) {
-                            Object.assign(postFields, parseStr(nextArg));
+                            Object.assign(postFields, postJson ? JSON.parse(nextArg) : parseStr(nextArg));
                         } else {
                             postFields = nextArg;
                         }
@@ -938,7 +939,7 @@
                     return opS;
                 };
 
-                if (postJson && !isEmptyObject(postFields)) {
+                if (postJson && !isEmptyObject(postFields) && typeof postFields !== 'object') {
                     var postObj = [];
                     try {
                         var tmp = JSON.parse(postFields);
