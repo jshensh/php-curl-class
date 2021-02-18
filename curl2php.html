@@ -928,7 +928,7 @@
                     };
 
                     for (var i in f) {
-                        if (typeof f[i] === 'object') {
+                        if (typeof f[i] === 'object' && f[i] !== null) {
                             opS += tabs + (toString.apply(f) === '[object Array]' ? '' : (rightPad((typeof i === 'string' ? ('\'' + i.replace(/'/g, '\\\'') + '\'') : i), maxLength + 2) + ' => ')) + "[\n";
                             opS += getPHPArray(f[i], tabs + '    ');
                             opS += tabs + "],\n";
