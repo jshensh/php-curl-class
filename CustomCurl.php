@@ -391,7 +391,20 @@ class CustomCurl extends CustomCurlCommon
                 if (!is_bool($v)) {
                     return $this;
                 }
+                break;
             case CURLOPT_ENCODING:
+                // no break
+            case CURLOPT_SSLCERT:
+                // no break
+            case CURLOPT_SSLCERTPASSWD:
+                // no break
+            case CURLOPT_SSLCERTTYPE:
+                // no break
+            case CURLOPT_SSLKEY:
+                // no break
+            case CURLOPT_SSLKEYPASSWD:
+                // no break
+            case CURLOPT_SSLKEYTYPE:
                 if (!is_string($v)) {
                     return $this;
                 }
