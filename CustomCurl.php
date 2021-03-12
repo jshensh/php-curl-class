@@ -569,6 +569,15 @@ class CustomCurl extends CustomCurlCommon
             curl_setopt($ch, CURLOPT_COOKIE, $sendCookies);
         }
         if (in_array($this->method, ['post', 'put'])) {
+            $definedHeaders = ['Content-Type' => false, 'Content-Length' => false];
+            foreach ($this->conf['customHeader'] as $header) {
+                foreach ($definedHeaders as $key => $defined) {
+                    if (preg_match('/^' . $key . '/is', $header)) {
+                        $definedHeaders[$key] = true;
+                    }
+                }
+            }
+
             if ($this->conf['postType'] === 'json') {
                 if (is_string($this->conf['postFields'])) {
                     $postJsonData = $this->conf['postFields'];
@@ -576,8 +585,12 @@ class CustomCurl extends CustomCurlCommon
                     $postJsonData = json_encode($this->conf['postFields']);
                 }
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $postJsonData);
-                $this->conf['customHeader'][] = 'Content-Type: application/json';
-                $this->conf['customHeader'][] = 'Content-Length: ' . strlen($postJsonData);
+                if (!$definedHeaders['Content-Type']) {
+                    $this->conf['customHeader'][] = 'Content-Type: application/json';
+                }
+                if (!$definedHeaders['Content-Length']) {
+                    $this->conf['customHeader'][] = 'Content-Length: ' . strlen($postJsonData);
+                }
             } else if ($this->conf['postType'] === 'form') {
                 if (is_array($this->conf['postFields'])) {
                     if ($this->conf['postFieldsMultiPart']) {
@@ -591,8 +604,12 @@ class CustomCurl extends CustomCurlCommon
             } else {
                 if (is_string($this->conf['postFields'])) {
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $this->conf['postFields']);
-                    $this->conf['customHeader'][] = 'Content-Type: text/plain';
-                    $this->conf['customHeader'][] = 'Content-Length: ' . strlen($this->conf['postFields']);
+                    if (!$definedHeaders['Content-Type']) {
+                        $this->conf['customHeader'][] = 'Content-Type: text/plain';
+                    }
+                    if (!$definedHeaders['Content-Length']) {
+                        $this->conf['customHeader'][] = 'Content-Length: ' . strlen($this->conf['postFields']);
+                    }
                 }
             }
         }
