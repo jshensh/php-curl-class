@@ -186,7 +186,8 @@ class CustomCurl extends CustomCurlCommon
                 'proxyPort'            => 8080,
                 'proxyUserPwd'         => '',
                 'proxyType'            => CURLPROXY_HTTP,
-                'postFieldsBuildQuery' => true
+                'postFieldsBuildQuery' => true,
+                'postFieldsMultiPart'  => false
             ],
             $defaultCurlopt = [
                 CURLOPT_SSL_VERIFYPEER => false,
@@ -352,6 +353,10 @@ class CustomCurl extends CustomCurlCommon
             case 'followLocation':
                 // no break
             case 'autoRefer':
+                // no break
+            case 'postFieldsBuildQuery':
+                // no break
+            case 'postFieldsMultiPart':
                 $v = (bool)$v;
                 break;
             case 'referer':
@@ -365,8 +370,6 @@ class CustomCurl extends CustomCurlCommon
             case 'proxyType':
                 // no break
             case 'userAgent':
-                // no break
-            case 'postFieldsBuildQuery':
                 break;
             default:
                 return $this;
@@ -506,6 +509,41 @@ class CustomCurl extends CustomCurlCommon
     }
 
     /**
+     * 创建 Multi Part 表单请求
+     * @access public
+     * @param array $fields 需要传输的表单内容（不含文件）
+     * @return CustomCurl
+     */
+    // private function buildMultiPartRequest($fields, $files)
+    private function buildMultiPartRequest($fields)
+    {
+        $boundary = uniqid();
+        $delimiter = '-------------' . $boundary;
+        $data = '';
+
+        foreach ($fields as $name => $content) {
+            $data .= "--" . $delimiter . "\r\n"
+                . 'Content-Disposition: form-data; name="' . $name . "\"\r\n\r\n"
+                . $content . "\r\n";
+        }
+        // foreach ($files as $name => $content) {
+        //     $data .= "--" . $delimiter . "\r\n"
+        //         . 'Content-Disposition: form-data; name="' . $name . '"; filename="' . $name . '"' . "\r\n\r\n"
+        //         . $content . "\r\n";
+        // }
+
+        $data .= "--" . $delimiter . "--\r\n";
+
+        return [
+            'headers' => [
+                'Content-Type: multipart/form-data; boundary=' . $delimiter,
+                'Content-Length: ' . strlen($data)
+            ],
+            'postFields' => $data
+        ];
+    }
+
+    /**
      * 执行 Curl
      * @access public
      * @return CustomCurlStatement
@@ -542,7 +580,13 @@ class CustomCurl extends CustomCurlCommon
                 $this->conf['customHeader'][] = 'Content-Length: ' . strlen($postJsonData);
             } else if ($this->conf['postType'] === 'form') {
                 if (is_array($this->conf['postFields'])) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $this->conf['postFieldsBuildQuery'] ? http_build_query($this->conf['postFields']) : $this->conf['postFields']);
+                    if ($this->conf['postFieldsMultiPart']) {
+                        $multiPart = $this->buildMultiPartRequest($this->conf['postFields']);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $multiPart['postFields']);
+                        $this->conf['customHeader'] = array_merge($this->conf['customHeader'], $multiPart['headers']);
+                    } else {
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $this->conf['postFieldsBuildQuery'] ? http_build_query($this->conf['postFields']) : $this->conf['postFields']);
+                    }
                 }
             } else {
                 if (is_string($this->conf['postFields'])) {

@@ -173,6 +173,8 @@ $curlObj = CustomCurl::init('http://cn.bing.com')
             ->set('autoRefer', 1)                       // CURLOPT_AUTOREFERER，默认值 True
             ->set('maxRedirs', 1)                       // CURLOPT_MAXREDIRS，默认值 3
             ->set('userAgent', 'Mozilla')               // CURLOPT_USERAGENT
+            ->set('postFieldsBuildQuery', false)        // POST 时是否 build 成字符串传递，默认值 true
+            ->set('postFieldsMultiPart', true)          // POST 时是否以 multipart/form-data 传递，优先级高于 postFieldsBuildQuery，默认值 false
             ->exec();
 
 if (!$curlObj->getStatus()) {
@@ -243,6 +245,8 @@ CustomCurl::setConf('proxy', '127.0.0.1');                    // 代理
 CustomCurl::setConf('proxyPort', 8080);                       // 代理端口
 CustomCurl::setConf('proxyUserPwd', '[username]:[password]'); // 代理用户名密码
 CustomCurl::setConf('proxyType', CURLPROXY_HTTP);             // 代理方式
+CustomCurl::setConf('postFieldsBuildQuery', false);           // POST 时是否 build 成字符串传递，默认值 true
+CustomCurl::setConf('postFieldsMultiPart', true);             // POST 时是否以 multipart/form-data 传递，优先级高于 postFieldsBuildQuery，默认值 false
 // 以上为所有可修改的全局配置项
 
 $curlObj = CustomCurl::init('http://lab.imjs.work/server.php')

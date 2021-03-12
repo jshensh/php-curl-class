@@ -17,6 +17,7 @@ CustomCurl::setConf('proxyPort', 8080);
 CustomCurl::setConf('proxyUserPwd', '');
 CustomCurl::setConf('proxyType', '');
 CustomCurl::setConf('postFieldsBuildQuery', false);
+CustomCurl::setConf('postFieldsMultiPart', true);
 
 $curlObj0 = CustomCurl::init('http://127.0.0.1/examples/example_server.php')
                 ->set('userAgent', 'Test')
