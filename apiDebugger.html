@@ -313,6 +313,10 @@
                 $('#paramsContainer').find(`input[id$="${uuid[2]}_value"]`).attr('name', paramKeyInputs[i].value);
             }
 
+            $(formDom).find('button[type="submit"]').attr('disabled', 'disabled');
+            responseHeaderCodeEditor.setValue('');
+            responseBodyCodeEditor.setValue('');
+
             var requestData = (function() {
                 switch ($('#method').val()) {
                     case 'GET':
@@ -331,16 +335,21 @@
             })();
 
             var getBlob = (url, method, headers, data) => {
-                return new Promise((resolve) => {
+                return new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
 
                     xhr.open(method.toUpperCase(), url, true);
                     xhr.responseType = 'blob';
                     xhr.onload = () => {
                         if (xhr.status === 200) {
-                            resolve(xhr.response);
+                            resolve(xhr);
+                        } else {
+                            reject(xhr, 'error');
                         }
-                    }
+                    };
+                    xhr.onerror = () => {
+                        reject(xhr, 'error');
+                    };
 
                     var setRequestHeader = xhr.setRequestHeader;
                     xhr.setRequestHeader = function(name, value) {
@@ -380,10 +389,6 @@
                         return xhr;
                     },
                     beforeSend: function(xhr) {
-                        $(formDom).find('button[type="submit"]').attr('disabled', 'disabled');
-                        responseHeaderCodeEditor.setValue('');
-                        responseBodyCodeEditor.setValue('');
-
                         headers['Authorization'] = 'Bearer ' + $('#token').val();
 
                         for (var i in headers) {
@@ -407,20 +412,30 @@
                         $('#token').val(authorization[1]);
                     }
                 }
-                if (xhr.responseText) {
-                    responseBodyCodeEditor.setValue(xhr.responseText);
+                try {
+                    if (xhr.responseText) {
+                        responseBodyCodeEditor.setValue(xhr.responseText);
+                    }
+                } catch(e) {
+                    var reader = new FileReader();
+                    reader.onload = function(event){
+                        responseBodyCodeEditor.setValue(reader.result);
+                    };
+                    reader.readAsText(xhr.response, 'utf-8');
                 }
             };
 
-            var saveFile = function(blob) {
+            var saveFile = function(xhr) {
                 if (window.navigator.msSaveOrOpenBlob) {
-                    navigator.msSaveBlob(blob, filename);
+                    navigator.msSaveBlob(xhr.response, filename);
                 } else {
                     const link = document.createElement('a');
                     const body = document.querySelector('body');
 
-                    link.href = window.URL.createObjectURL(blob); // 创建对象url
-                    link.download = 'cert.zip';
+                    var fileName = xhr.getResponseHeader('Content-Disposition').match(/filename="(.*?)"/);
+
+                    link.href = window.URL.createObjectURL(xhr.response); // 创建对象url
+                    link.download = typeof fileName[1] !== 'undefined' ? fileName[1] : 'download';
 
                     // fix Firefox
                     link.style.display = 'none';
