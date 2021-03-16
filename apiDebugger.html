@@ -286,7 +286,6 @@
                     $('#token').val('');
                 },
                 complete: function(xhr, status) {
-                    console.log(xhr, status, formDom)
                     $(formDom).find('button[type="submit"]').removeAttr('disabled');
                     var list = xhr.getAllResponseHeaders();
                     if (status === 'error') {
@@ -399,7 +398,6 @@
             };
 
             var renderData = function(data, status, xhr) {
-                console.log(arguments);
                 $(formDom).find('button[type="submit"]').removeAttr('disabled');
                 var list = xhr.getAllResponseHeaders();
                 if (list) {
@@ -415,7 +413,6 @@
             };
 
             var saveFile = function(blob) {
-                console.log(arguments);
                 if (window.navigator.msSaveOrOpenBlob) {
                     navigator.msSaveBlob(blob, filename);
                 } else {
