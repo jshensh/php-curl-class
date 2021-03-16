@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-        <title>JWT Api Debugger</title>
+        <title>JWT Debugger</title>
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
         <link href="https://cdn.jsdelivr.net/npm/codemirror@5.58.3/lib/codemirror.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/codemirror@5.58.3/lib/codemirror.min.js"></script>
@@ -20,27 +20,29 @@
         <div class="contianer" style="margin: 20px;">
             <div class="row">
                 <div class="col-md-4 col-lg-3" id="leftPanel">
-                    <form onsubmit="loginApi(this); return false;">
-                        <div class="form-group">
-                            <label for="loginUrl">Login URL</label>
-                            <input type="text" class="form-control" id="loginUrl" placeholder="https://" value="">
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="text" class="form-control" name="email" id="email" placeholder="Email" value="">
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control" name="password" id="password" placeholder="Password" value="">
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Flush Token</button>
-                        </div>
-                        <div class="form-group">
-                            <textarea class="form-control" id="token" placeholder="Authorization" rows="7" readonly="readonly"></textarea>
-                        </div>
-                    </form>
-                    <hr />
+                    <div style="display: none;">
+                        <form onsubmit="loginApi(this); return false;">
+                            <div class="form-group">
+                                <label for="loginUrl">Login URL</label>
+                                <input type="text" class="form-control" id="loginUrl" placeholder="https://" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="text" class="form-control" name="email" id="email" placeholder="Email" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="Password" value="">
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Flush Token</button>
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control" id="token" placeholder="Authorization" rows="7" readonly="readonly"></textarea>
+                            </div>
+                        </form>
+                        <hr />
+                    </div>
                     <form class="form-horizontal">
                         <div class="form-group">
                             <label for="apiUrl" class="col-sm-2 control-label">Api List</label>
@@ -68,6 +70,7 @@
                             </div>
                         </div>
                     </form>
+                    <p><label><input type="checkbox" id="isDownloadFile" /> For download file</label></p>
                     <label>Headers</label>
                     <form class="form-horizontal" id="headersContainer">
                         <div class="form-group" id="header_content_type_row">
@@ -328,30 +331,24 @@
                 }
             })();
 
-            $.ajax({
-                url: $('#apiUrl').val(),
-                type: $('#method').val(),
-                cache: false,
-                data: requestData,
-                processData: false,
-                contentType: false,
-                xhr: function() {
-                    var xhr = jQuery.ajaxSettings.xhr();
+            var getBlob = (url, method, headers, data) => {
+                return new Promise((resolve) => {
+                    const xhr = new XMLHttpRequest();
+
+                    xhr.open(method.toUpperCase(), url, true);
+                    xhr.responseType = 'blob';
+                    xhr.onload = () => {
+                        if (xhr.status === 200) {
+                            resolve(xhr.response);
+                        }
+                    }
+
                     var setRequestHeader = xhr.setRequestHeader;
                     xhr.setRequestHeader = function(name, value) {
                         var force = (typeof value['force'] === 'undefined') ? false : value['force'];
                         if (name === 'X-Requested-With' && !force) return;
                         setRequestHeader.call(this, name, value);
                     }
-                    return xhr;
-                },
-                beforeSend: function(xhr) {
-                    $(formDom).find('button[type="submit"]').attr('disabled', 'disabled');
-                    responseHeaderCodeEditor.setValue('');
-                    responseBodyCodeEditor.setValue('');
-
-                    var headers = $('#headersContainer').serializeFormToJson();
-                    headers['Authorization'] = 'Bearer ' + $('#token').val();
 
                     for (var i in headers) {
                         if (i && headers[i]) {
@@ -360,22 +357,94 @@
                             })(i, headers[i]);
                         }
                     }
-                },
-                complete: function(xhr, status) {
-                    $(formDom).find('button[type="submit"]').removeAttr('disabled');
-                    var list = xhr.getAllResponseHeaders();
+
+                    xhr.send(data);
+                });
+            };
+
+            var getData = (url, method, headers, requestData) => {
+                return $.ajax({
+                    url: url,
+                    type: method,
+                    cache: false,
+                    data: requestData,
+                    processData: false,
+                    contentType: false,
+                    xhr: function() {
+                        var xhr = jQuery.ajaxSettings.xhr();
+                        var setRequestHeader = xhr.setRequestHeader;
+                        xhr.setRequestHeader = function(name, value) {
+                            var force = (typeof value['force'] === 'undefined') ? false : value['force'];
+                            if (name === 'X-Requested-With' && !force) return;
+                            setRequestHeader.call(this, name, value);
+                        }
+                        return xhr;
+                    },
+                    beforeSend: function(xhr) {
+                        $(formDom).find('button[type="submit"]').attr('disabled', 'disabled');
+                        responseHeaderCodeEditor.setValue('');
+                        responseBodyCodeEditor.setValue('');
+
+                        headers['Authorization'] = 'Bearer ' + $('#token').val();
+
+                        for (var i in headers) {
+                            if (i && headers[i]) {
+                                (function(k, v) {
+                                    xhr.setRequestHeader(k, {toString: () => { return v; }, force: true}, true);
+                                })(i, headers[i]);
+                            }
+                        }
+                    }
+                });
+            };
+
+            var renderData = function(data, status, xhr) {
+                console.log(arguments);
+                $(formDom).find('button[type="submit"]').removeAttr('disabled');
+                var list = xhr.getAllResponseHeaders();
+                if (list) {
+                    responseHeaderCodeEditor.setValue(list);
                     var authorization = list.match(/^authorization: Bearer (.*)$/m);
                     if (authorization) {
                         $('#token').val(authorization[1]);
                     }
-                    if (list) {
-                        responseHeaderCodeEditor.setValue(list);
-                    }
-                    if (xhr.responseText) {
-                        responseBodyCodeEditor.setValue(xhr.responseText);
-                    }
                 }
-            });
+                if (xhr.responseText) {
+                    responseBodyCodeEditor.setValue(xhr.responseText);
+                }
+            };
+
+            var saveFile = function(blob) {
+                console.log(arguments);
+                if (window.navigator.msSaveOrOpenBlob) {
+                    navigator.msSaveBlob(blob, filename);
+                } else {
+                    const link = document.createElement('a');
+                    const body = document.querySelector('body');
+
+                    link.href = window.URL.createObjectURL(blob); // 创建对象url
+                    link.download = 'cert.zip';
+
+                    // fix Firefox
+                    link.style.display = 'none';
+                    body.appendChild(link);
+
+                    link.click();
+                    body.removeChild(link);
+
+                    window.URL.revokeObjectURL(link.href); // 通过调用 URL.createObjectURL() 创建的 URL 对象
+                }
+            };
+
+            if ($('#isDownloadFile').prop('checked')) {
+                getBlob($('#apiUrl').val(), $('#method').val(), $('#headersContainer').serializeFormToJson(), requestData)
+                    .then(saveFile)
+                    .catch((xhr, status) => { renderData('', status, xhr); });
+            } else {
+                getData($('#apiUrl').val(), $('#method').val(), $('#headersContainer').serializeFormToJson(), requestData)
+                    .then((data, status, xhr) => { renderData(data, status, xhr); })
+                    .catch((xhr, status) => { renderData('', status, xhr); });
+            }
         };
 
         $(function() {
@@ -426,7 +495,8 @@
                 responseBodyCodeEditor.setSize(null, (size * 2) + 'px');
             });
 
-            var baseHeight = window.innerHeight < (document.getElementById('leftPanel').offsetHeight + 98) ? (document.getElementById('leftPanel').offsetHeight + 174) : window.innerHeight;            var size = (baseHeight - 150 < 0 ? 300 : (baseHeight - 150) / 3);
+            var baseHeight = window.innerHeight < (document.getElementById('leftPanel').offsetHeight + 98) ? (document.getElementById('leftPanel').offsetHeight + 174) : window.innerHeight;
+            var size = (baseHeight - 150 < 0 ? 300 : (baseHeight - 150) / 3);
             responseHeaderCodeEditor.setSize(null, size + 'px');
             responseBodyCodeEditor.setSize(null, (size * 2) + 'px');
 
@@ -553,6 +623,11 @@
             var apiList = {};
 
             var changeApi = function(api) {
+                var willClearCheckboxList = ['isDownloadFile'];
+                for (var i in willClearCheckboxList) {
+                    $(`#${i}`).removeProp('checked');
+                }
+
                 $('#headersContainer').find(`a`).trigger('click');
                 for (var i in api['headers']) {
                     if (i === 'Content-Type') {
@@ -594,6 +669,16 @@
                 }
 
                 $('#apiUrl').val(api['url']);
+
+                if (typeof api['config'] !== 'undefined') {
+                    for (var i in api['config']) {
+                        if (api['config'][i]) {
+                            $(`#${i}`).prop('checked', 'checked');
+                        } else {
+                            $(`#${i}`).removeProp('checked');
+                        }
+                    }
+                }
             };
 
             var formatApi = function (api) {
@@ -601,7 +686,7 @@
                     return api.text;
                 }
 
-                return api.name;
+                return $('<span>').html(api.name.replace(/^(.*)\-([^\-]+$)/, "$1<br />&nbsp;&nbsp;&nbsp;&nbsp;- $2"));
             };
 
             var formatApiSelection = function (api) {
