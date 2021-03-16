@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-        <title>JWT Debugger</title>
+        <title>JWT Api Debugger</title>
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
         <link href="https://cdn.jsdelivr.net/npm/codemirror@5.58.3/lib/codemirror.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/codemirror@5.58.3/lib/codemirror.min.js"></script>
@@ -686,7 +686,7 @@
                     return api.text;
                 }
 
-                return $('<span>').html(api.name.replace(/^(.*)\-([^\-]+$)/, "$1<br />&nbsp;&nbsp;&nbsp;&nbsp;- $2"));
+                return api.name;
             };
 
             var formatApiSelection = function (api) {
