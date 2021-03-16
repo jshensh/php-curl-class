@@ -426,6 +426,7 @@
             };
 
             var saveFile = function(xhr) {
+                $(formDom).find('button[type="submit"]').removeAttr('disabled');
                 if (window.navigator.msSaveOrOpenBlob) {
                     navigator.msSaveBlob(xhr.response, filename);
                 } else {
@@ -435,7 +436,7 @@
                     var fileName = xhr.getResponseHeader('Content-Disposition').match(/filename="(.*?)"/);
 
                     link.href = window.URL.createObjectURL(xhr.response); // 创建对象url
-                    link.download = typeof fileName[1] !== 'undefined' ? fileName[1] : 'download';
+                    link.download = typeof fileName[1] !== 'undefined' ? fileName[1] : 'download_' . uuid();
 
                     // fix Firefox
                     link.style.display = 'none';
