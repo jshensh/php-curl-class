@@ -403,6 +403,10 @@
             };
 
             var renderData = function(data, status, xhr) {
+                if (xhr instanceof Error) {
+                    throw xhr;
+                }
+                
                 $(formDom).find('button[type="submit"]').removeAttr('disabled');
                 var list = xhr.getAllResponseHeaders();
                 if (list) {
@@ -427,26 +431,40 @@
 
             var saveFile = function(xhr) {
                 $(formDom).find('button[type="submit"]').removeAttr('disabled');
-                if (window.navigator.msSaveOrOpenBlob) {
-                    navigator.msSaveBlob(xhr.response, filename);
-                } else {
-                    const link = document.createElement('a');
-                    const body = document.querySelector('body');
-
-                    var fileName = xhr.getResponseHeader('Content-Disposition').match(/filename="(.*?)"/);
-
-                    link.href = window.URL.createObjectURL(xhr.response); // 创建对象url
-                    link.download = typeof fileName[1] !== 'undefined' ? fileName[1] : 'download_' . uuid();
-
-                    // fix Firefox
-                    link.style.display = 'none';
-                    body.appendChild(link);
-
-                    link.click();
-                    body.removeChild(link);
-
-                    window.URL.revokeObjectURL(link.href); // 通过调用 URL.createObjectURL() 创建的 URL 对象
+                
+                if (typeof xhr.getAllResponseHeaders !== 'undefined') {
+                    responseHeaderCodeEditor.setValue(xhr.getAllResponseHeaders());
                 }
+
+                var fileName = (xhr.getResponseHeader('Content-Disposition') ?? '').match(/filename="(.*?)"/);
+
+                if (fileName && typeof fileName[1] !== 'undefined') {
+                    if (window.navigator.msSaveOrOpenBlob) {
+                        navigator.msSaveBlob(xhr.response, filename);
+                    } else {
+                        const link = document.createElement('a');
+                        const body = document.querySelector('body');
+
+
+                        link.href = window.URL.createObjectURL(xhr.response); // 创建对象url
+                        link.download = fileName[1];
+
+                        // fix Firefox
+                        link.style.display = 'none';
+                        body.appendChild(link);
+
+                        link.click();
+                        body.removeChild(link);
+
+                        window.URL.revokeObjectURL(link.href); // 通过调用 URL.createObjectURL() 创建的 URL 对象
+                    }
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function(event){
+                    responseBodyCodeEditor.setValue(reader.result);
+                };
+                reader.readAsText(xhr.response, 'utf-8');
             };
 
             if ($('#isDownloadFile').prop('checked')) {
