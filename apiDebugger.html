@@ -636,7 +636,7 @@
             var changeApi = function(api) {
                 var willClearCheckboxList = ['isDownloadFile'];
                 for (var i in willClearCheckboxList) {
-                    $(`#${i}`).removeProp('checked');
+                    $(`#${willClearCheckboxList[i]}`).prop('checked', '');
                 }
 
                 $('#headersContainer').find(`a`).trigger('click');
