@@ -436,7 +436,7 @@
                     responseHeaderCodeEditor.setValue(xhr.getAllResponseHeaders());
                 }
 
-                var fileName = (xhr.getResponseHeader('Content-Disposition') ?? '').match(/filename="(.*?)"/);
+                var fileName = (xhr.getResponseHeader('Content-Disposition') ?? '').match(/filename="?(.*?)"?$/);
 
                 if (fileName && typeof fileName[1] !== 'undefined') {
                     if (window.navigator.msSaveOrOpenBlob) {
