@@ -298,6 +298,7 @@
             });
         };
 
+
         var requestApi = function(formDom) {
             var headerKeyInputs = $('#headersContainer').find('input[id$="_key"]');
 
@@ -334,15 +335,22 @@
                 }
             })();
 
-            var getBlob = (url, method, headers, data) => {
+            var getData = (url, method, headers, data, getBlob) => {
                 return new Promise((resolve, reject) => {
+                    var sendWithData = true;
+                    if (['GET', 'DELETE', 'OPTIONS'].indexOf($('#method').val()) > -1 && typeof data === 'string') {
+                        url = url.match(/\?/) ? `${url}&${data}` : `${url}?${data}`;
+                        sendWithData = false;
+                    }
                     const xhr = new XMLHttpRequest();
 
                     xhr.open(method.toUpperCase(), url, true);
-                    xhr.responseType = 'blob';
+                    if (typeof getBlob !== 'undefined') {
+                        xhr.responseType = 'blob';
+                    }
                     xhr.onload = () => {
                         if (xhr.status === 200) {
-                            resolve(xhr);
+                            resolve(xhr, 'success');
                         } else {
                             reject(xhr, 'error');
                         }
@@ -358,6 +366,7 @@
                         setRequestHeader.call(this, name, value);
                     }
 
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + $('#token').val());
                     for (var i in headers) {
                         if (i && headers[i]) {
                             (function(k, v) {
@@ -366,47 +375,19 @@
                         }
                     }
 
-                    xhr.send(data);
-                });
-            };
-
-            var getData = (url, method, headers, requestData) => {
-                return $.ajax({
-                    url: url,
-                    type: method,
-                    cache: false,
-                    data: requestData,
-                    processData: false,
-                    contentType: false,
-                    xhr: function() {
-                        var xhr = jQuery.ajaxSettings.xhr();
-                        var setRequestHeader = xhr.setRequestHeader;
-                        xhr.setRequestHeader = function(name, value) {
-                            var force = (typeof value['force'] === 'undefined') ? false : value['force'];
-                            if (name === 'X-Requested-With' && !force) return;
-                            setRequestHeader.call(this, name, value);
-                        }
-                        return xhr;
-                    },
-                    beforeSend: function(xhr) {
-                        headers['Authorization'] = 'Bearer ' + $('#token').val();
-
-                        for (var i in headers) {
-                            if (i && headers[i]) {
-                                (function(k, v) {
-                                    xhr.setRequestHeader(k, {toString: () => { return v; }, force: true}, true);
-                                })(i, headers[i]);
-                            }
-                        }
+                    if (sendWithData) {
+                        xhr.send(data);
+                    } else {
+                        xhr.send();
                     }
                 });
             };
 
-            var renderData = function(data, status, xhr) {
+            var renderData = function(xhr, status) {
                 if (xhr instanceof Error) {
                     throw xhr;
                 }
-                
+
                 $(formDom).find('button[type="submit"]').removeAttr('disabled');
                 var list = xhr.getAllResponseHeaders();
                 if (list) {
@@ -468,13 +449,13 @@
             };
 
             if ($('#isDownloadFile').prop('checked')) {
-                getBlob($('#apiUrl').val(), $('#method').val(), $('#headersContainer').serializeFormToJson(), requestData)
+                getData($('#apiUrl').val(), $('#method').val(), $('#headersContainer').serializeFormToJson(), requestData, true)
                     .then(saveFile)
-                    .catch((xhr, status) => { renderData('', status, xhr); });
+                    .catch(renderData);
             } else {
                 getData($('#apiUrl').val(), $('#method').val(), $('#headersContainer').serializeFormToJson(), requestData)
-                    .then((data, status, xhr) => { renderData(data, status, xhr); })
-                    .catch((xhr, status) => { renderData('', status, xhr); });
+                    .then(renderData)
+                    .catch(renderData);
             }
         };
 
