@@ -298,7 +298,6 @@
             });
         };
 
-
         var requestApi = function(formDom) {
             var headerKeyInputs = $('#headersContainer').find('input[id$="_key"]');
 
@@ -339,7 +338,7 @@
                 return new Promise((resolve, reject) => {
                     var sendWithData = true;
                     if (['GET', 'DELETE', 'OPTIONS'].indexOf($('#method').val()) > -1 && typeof data === 'string') {
-                        url = url.match(/\?/) ? `${url}&${data}` : `${url}?${data}`;
+                        url = data ? (url.match(/\?/) ? `${url}&${data}` : `${url}?${data}`) : url;
                         sendWithData = false;
                     }
                     const xhr = new XMLHttpRequest();
