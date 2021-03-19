@@ -264,35 +264,6 @@
     <script>
         var responseHeaderCodeEditor, responseBodyCodeEditor, requestJsonCodeEditor;
 
-        var decodeUTF8 = function(bytes) {
-            var i = 0, s = '';
-            while (i < bytes.length) {
-                var c = bytes[i++];
-                if (c > 127) {
-                    if (c > 191 && c < 224) {
-                        if (i >= bytes.length)
-                            throw new Error('UTF-8 decode: incomplete 2-byte sequence');
-                        c = (c & 31) << 6 | bytes[i++] & 63;
-                    } else if (c > 223 && c < 240) {
-                        if (i + 1 >= bytes.length)
-                            throw new Error('UTF-8 decode: incomplete 3-byte sequence');
-                        c = (c & 15) << 12 | (bytes[i++] & 63) << 6 | bytes[i++] & 63;
-                    } else if (c > 239 && c < 248) {
-                        if (i + 2 >= bytes.length)
-                            throw new Error('UTF-8 decode: incomplete 4-byte sequence');
-                        c = (c & 7) << 18 | (bytes[i++] & 63) << 12 | (bytes[i++] & 63) << 6 | bytes[i++] & 63;
-                    } else throw new Error('UTF-8 decode: unknown multibyte start 0x' + c.toString(16) + ' at index ' + (i - 1));
-                }
-                if (c <= 0xffff) s += String.fromCharCode(c);
-                else if (c <= 0x10ffff) {
-                    c -= 0x10000;
-                    s += String.fromCharCode(c >> 10 | 0xd800)
-                    s += String.fromCharCode(c & 0x3FF | 0xdc00)
-                } else throw new Error('UTF-8 decode: code point 0x' + c.toString(16) + ' exceeds UTF-16 reach');
-            }
-            return s;
-        };
-
         var loginApi = function(formDom) {
             $.ajax({
                 url: $('#loginUrl').val(),
@@ -352,15 +323,9 @@
                     return (function(hex) {
                         hex = hex.replace(/[^0-9A-Fa-f]/g, '');
                         hex = hex.length % 2 ? '0' + hex : hex;
-                        var utf8Arr = [];
-                        for (var i = 0; i < hex.length; i += 2) {
-                            var tmpInt = parseInt(hex[i] + hex[i + 1], 16);
-                            if (isNaN(tmpInt)) {
-                                throw new Error('Parse hex string error');
-                            }
-                            utf8Arr.push(tmpInt);
-                        }
-                        return decodeUTF8(utf8Arr);
+                        return new Uint8Array(hex.match(/[\da-fA-F]{2}/gi).map(function (h) {
+                            return parseInt(h, 16);
+                        }));
                     })(requestJsonCodeEditor.getValue());
                 }
 
@@ -470,7 +435,6 @@
                     } else {
                         const link = document.createElement('a');
                         const body = document.querySelector('body');
-
 
                         link.href = window.URL.createObjectURL(xhr.response); // 创建对象url
                         link.download = fileName[1];
