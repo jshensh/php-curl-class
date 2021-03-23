@@ -1,5 +1,5 @@
 {
-    "name": "jshensh/phpCurlClass",
+    "name": "jshensh/php-curl-class",
     "type": "library",
     "description": "PHP HTTP client, based on cURL",
     "keywords": [
