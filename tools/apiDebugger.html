@@ -81,6 +81,7 @@
                                     <option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
                                     <option value="application/json">application/json</option>
                                     <option value="text/xml">text/xml</option>
+                                    <option value="application/octet-stream">application/octet-stream</option>
                                 </select>
                             </div>
                         </div>
@@ -318,6 +319,16 @@
             responseBodyCodeEditor.setValue('');
 
             var requestData = (function() {
+                if ($('#header_content_type_value').val() === 'application/octet-stream') {
+                    return (function(hex) {
+                        hex = hex.replace(/[^0-9A-Fa-f]/g, '');
+                        hex = hex.length % 2 ? '0' + hex : hex;
+                        return new Uint8Array(hex.match(/[\da-fA-F]{2}/gi).map(function (h) {
+                            return parseInt(h, 16);
+                        }));
+                    })(requestJsonCodeEditor.getValue());
+                }
+
                 switch ($('#method').val()) {
                     case 'GET':
                     case 'DELETE':
@@ -424,7 +435,6 @@
                     } else {
                         const link = document.createElement('a');
                         const body = document.querySelector('body');
-
 
                         link.href = window.URL.createObjectURL(xhr.response); // 创建对象url
                         link.download = fileName[1];
@@ -620,6 +630,7 @@
                         $('#addParamButton').show();
                         $('#addFileButton').show();
                         break;
+                        
                     default:
                         $('#stringContainer').show();
                         $('#paramsContainer').hide();
@@ -668,6 +679,13 @@
                             }
                             $('#paramsContainer').append(inputDomRender('param', 'text'));
 
+                            break;
+                        case 'application/octet-stream':
+                            requestJsonCodeEditor.setValue(api['params']);
+                            $('#stringContainer').show();
+                            $('#paramsContainer').hide();
+                            $('#addParamButton').hide();
+                            $('#addFileButton').hide();
                             break;
                         default:
                             requestJsonCodeEditor.setValue(JSON.stringify(api['params'], null, "    "));
