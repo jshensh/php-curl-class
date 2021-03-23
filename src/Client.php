@@ -9,166 +9,16 @@
 // | Author: jshensh <admin@imjs.work>
 // +----------------------------------------------------------------------
 
-/**
- * Custom Curl 通用工具类
- * @author  jshensh <admin@imjs.work>
- */
-class CustomCurlCommon
-{
-    /**
-     * 解析 Cookie
-     * @access protected
-     * @param string $cookie Cookies 字符串
-     * @return array
-     */
-    protected static function parseCookie($cookie) 
-    {
-        $op = [];
-        $pieces = array_filter(array_map('trim', explode(';', $cookie)));
-        if (empty($pieces) || !strpos($pieces[0], '=')) {
-            return [];
-        }
-        foreach ($pieces as $part) {
-            $cookieParts = explode('=', $part, 2);
-            $key = trim($cookieParts[0]);
-            $value = isset($cookieParts[1])
-                ? trim($cookieParts[1], " \n\r\t\0\x0B")
-                : true;
-            $op[$key] = $value;
-        }
-        return $op;
-    }
+namespace CustomCurl;
 
-    /**
-     * 合并服务器返回的 Cookies 至 Cookie Jar 数组
-     * @access protected
-     * @param array $jar Cookie Jar 数组
-     * @param array $cookies Cookies 数组
-     * @return array
-     */
-    protected static function mergeCookieJar($jar, $cookies) 
-    {
-        foreach ($cookies as $cookie) {
-            if (isset($cookie['expires']) && strtotime($cookie['expires']) - time() <= 0 && isset($jar[key($cookie)])) {
-                unset($jar[key($cookie)]);
-            } else {
-                $jar[key($cookie)] = current($cookie);
-            }
-        }
-        return $jar;
-    }
-}
-
-/**
- * Custom Curl 结果类
- * @author  jshensh <admin@imjs.work>
- */
-class CustomCurlStatement extends CustomCurlCommon
-{
-    private $ch = null,
-            $output = '',
-            $body = '',
-            $header = '',
-            $responseCookies = [],
-            $curlInfo = [],
-            $curlErrNo = 0,
-            $status = false;
-
-    /**
-     * 构造方法
-     * @access public
-     * @param int      $curlErrNo Curl 错误码
-     * @param resource $ch Curl 句柄
-     * @param string   $output 请求结果
-     * @param array    &$cookieJarObj Cookie Jar 数组
-     * @return void
-     */
-    public function __construct($curlErrNo, $ch, $output, &$cookieJarObj = []) {
-        if ($curlErrNo !== 0) {
-            $this->curlErrNo = $curlErrNo;
-            return;
-        }
-        $this->status = true;
-        $this->curlInfo = curl_getinfo($ch);
-        $headerSize = $this->curlInfo['header_size'];
-        $this->header = substr($output, 0, $headerSize);
-        $this->body = substr($output, $headerSize);
-        preg_match_all('/Set-Cookie:(.*?)(\r\n|$)/is', $this->header, $responseCookiesArr);
-        if (count($responseCookiesArr[1])) {
-            foreach ($responseCookiesArr[1] as $value) {
-                $this->responseCookies[] = self::parseCookie($value);
-            }
-        }
-        $cookieJarObj = self::mergeCookieJar($cookieJarObj, $this->responseCookies);
-    }
-
-    /**
-     * 获取请求结果状态
-     * @access public
-     * @return bool
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * 获取请求结果的 body 部分
-     * @access public
-     * @return string
-     */
-    public function getBody()
-    {
-        return $this->body;
-    }
-
-    /**
-     * 获取请求结果的 Header 部分
-     * @access public
-     * @return string
-     */
-    public function getHeader()
-    {
-        return $this->header;
-    }
-
-    /**
-     * 获取 Curl 错误码
-     * @access public
-     * @return int
-     */
-    public function getCurlErrNo()
-    {
-        return $this->curlErrNo;
-    }
-
-    /**
-     * 获取请求结果的 Cookies 数组
-     * @access public
-     * @return array
-     */
-    public function getCookies()
-    {
-        return $this->responseCookies;
-    }
-
-    /**
-     * 获取请求结果的 Info
-     * @access public
-     * @param string $key Curl Info Key
-     * @return mixed
-     */
-    public function getInfo($key = '')
-    {
-        return $key ? (isset($this->curlInfo[$key]) ? $this->curlInfo[$key] : false) : $this->curlInfo;
-    }
-}
+use CustomCurl\Common;
+use CustomCurl\Statement;
 
 /**
  * Custom Curl 类
  * @author  jshensh <admin@imjs.work>
  */
-class CustomCurl extends CustomCurlCommon
+class Client extends Common
 {
     private static $defaultConf = [
                 'timeout'              => 5,
@@ -311,7 +161,7 @@ class CustomCurl extends CustomCurlCommon
      * @access public
      * @param string $url URL 字符串
      * @param string $method 请求方法，post 或者 get
-     * @return CustomCurl
+     * @return $this
      */
     public static function init($url, $method = 'get')
     {
@@ -323,7 +173,7 @@ class CustomCurl extends CustomCurlCommon
      * @access public
      * @param string $k 设置项 Key
      * @param string $v 设置项 Value
-     * @return CustomCurl
+     * @return $this
      */
     public function set($k, $v)
     {
@@ -383,7 +233,7 @@ class CustomCurl extends CustomCurlCommon
      * @access public
      * @param string $k 设置项 Key
      * @param string $v 设置项 Value
-     * @return CustomCurl
+     * @return $this
      */
     public function setCurlOpt($k, $v)
     {
@@ -424,7 +274,7 @@ class CustomCurl extends CustomCurlCommon
      * @access public
      * @param string $k Header Key
      * @param string $v Header Value
-     * @return CustomCurl
+     * @return $this
      */
     public function setHeader($k, $v)
     {
@@ -435,7 +285,7 @@ class CustomCurl extends CustomCurlCommon
     /**
      * 清空设置的 Header
      * @access public
-     * @return CustomCurl
+     * @return $this
      */
     public function clearHeaders()
     {
@@ -448,7 +298,7 @@ class CustomCurl extends CustomCurlCommon
      * @access public
      * @param string $k Cookie Key
      * @param string $v Cookie Value
-     * @return CustomCurl
+     * @return $this
      */
     public function setCookie($k, $v)
     {
@@ -461,7 +311,7 @@ class CustomCurl extends CustomCurlCommon
      * @access public
      * @param string|array  $parm Cookies 字符串或一维数组
      * @param bool          $append 是否追加设置
-     * @return CustomCurl
+     * @return $this
      */
     public function setCookies($parm, $append = false)
     {
@@ -484,7 +334,7 @@ class CustomCurl extends CustomCurlCommon
     /**
      * 清空 Cookies
      * @access public
-     * @return CustomCurl
+     * @return $this
      */
     public function clearCookies()
     {
@@ -496,7 +346,7 @@ class CustomCurl extends CustomCurlCommon
      * 设置 Cookie Jar
      * @access public
      * @param array &$jar Cookie Jar 数组
-     * @return CustomCurl
+     * @return $this
      */
     public function cookieJar(&$jar)
     {
@@ -512,7 +362,7 @@ class CustomCurl extends CustomCurlCommon
      * 创建 Multi Part 表单请求
      * @access public
      * @param array $fields 需要传输的表单内容（不含文件）
-     * @return CustomCurl
+     * @return $this
      */
     // private function buildMultiPartRequest($fields, $files)
     private function buildMultiPartRequest($fields)
@@ -546,7 +396,7 @@ class CustomCurl extends CustomCurlCommon
     /**
      * 执行 Curl
      * @access public
-     * @return CustomCurlStatement
+     * @return CustomCurl\Statement
      */
     public function exec()
     {
@@ -630,12 +480,12 @@ class CustomCurl extends CustomCurlCommon
         $output = curl_exec($ch);
         $curlErrNo = curl_errno($ch);
         if ($curlErrNo === 0 || ($this->conf['ignoreCurlError'] && $output)) {
-            return new CustomCurlStatement(0, $ch, $output, $this->cookieJarObj);
+            return new Statement(0, $ch, $output, $this->cookieJarObj);
         }
         $this->conf['reRequest']--;
         if ($this->conf['reRequest'] > 0) {
             return $this->exec();
         }
-        return new CustomCurlStatement($curlErrNo, $ch, $output);
+        return new Statement($curlErrNo, $ch, $output);
     }
 }

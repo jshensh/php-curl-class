@@ -1,0 +1,28 @@
+{
+    "name": "jshensh/phpCurlClass",
+    "type": "library",
+    "description": "PHP HTTP client, based on cURL",
+    "keywords": [
+        "http",
+        "web service",
+        "curl",
+        "client",
+        "HTTP client"
+    ],
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "jshensh",
+            "email": "admin@imjs.work",
+            "homepage": "https://233.imjs.work"
+        }
+    ],
+    "require": {
+        "php": "^5.6 || ^7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "CustomCurl\\": "src/"
+        }
+    }
+}

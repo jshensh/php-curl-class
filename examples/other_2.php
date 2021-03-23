@@ -1,7 +1,7 @@
 <?php
-require('../CustomCurl.php');
+use CustomCurl\Client;
 
-$curlObj = CustomCurl::init('http://127.0.0.1/examples/example_server.php')
+$curlObj = Client::init('http://127.0.0.1/examples/example_server.php')
             ->set('proxy', '127.0.0.1')
             ->set('proxyPort', 8080)
             ->set('proxyUserPwd', '[username]:[password]')

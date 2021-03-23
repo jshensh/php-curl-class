@@ -470,7 +470,7 @@
 
         var renderToCodeDom = function(msg) {
             if (arguments[1] !== void 0) {
-                phpCodeEditor.setValue("<?php\nrequire('CustomCurl.php');\n\n");
+                phpCodeEditor.setValue("<?php\nuse CustomCurl\\Client;\n\n");
             }
             phpCodeEditor.setValue(phpCodeEditor.getValue() + msg);
         };
@@ -883,7 +883,7 @@
                 return false;
             }
 
-            var op = "$curlObj" + requestI + " = CustomCurl::init('__url__'__method__)\n"
+            var op = "$curlObj" + requestI + " = Client::init('__url__'__method__)\n"
                         .replace('__url__', url)
                         .replace('__method__', (method.toUpperCase() === 'GET' ? '' : (", '" + method.toUpperCase() + "'")));
 
@@ -899,7 +899,7 @@
                 switch (i.toLowerCase()) {
                     case 'user-agent':
                         if (headers[i] !== tmpUserAgent) {
-                            op = "CustomCurl::setConf('userAgent', '" + headers[i].replace('\'', '\\\'') + "');\n\n" + op;
+                            op = "Client::setConf('userAgent', '" + headers[i].replace('\'', '\\\'') + "');\n\n" + op;
                             tmpUserAgent = headers[i];
                         }
                         // op += "                ->set('userAgent', '" + headers[i] + "')\n";

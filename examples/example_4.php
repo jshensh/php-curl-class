@@ -1,7 +1,7 @@
 <?php
-require('../CustomCurl.php');
+use CustomCurl\Client;
 
-$curlObj = CustomCurl::init('http://127.0.0.1/examples/example_server.php', 'put')
+$curlObj = Client::init('http://127.0.0.1/examples/example_server.php', 'put')
             ->set('postFields', ['fname' => 'jshensh'])
             ->set('postType', 'json')
             ->exec();

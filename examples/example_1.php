@@ -1,7 +1,7 @@
 <?php
-require('../CustomCurl.php');
+use CustomCurl\Client;
 
-$curlObj = CustomCurl::init('http://cn.bing.com/search?q=php')->exec();
+$curlObj = Client::init('http://cn.bing.com/search?q=php')->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
