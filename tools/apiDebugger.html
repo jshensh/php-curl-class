@@ -530,7 +530,8 @@
 
             var inputDomRender = function(name, type) {
                 var domName = name + '_' + uuid(),
-                    value = typeof arguments[2] === 'undefined' ? {'key': '', 'value': ''} : arguments[2];
+                    value = typeof arguments[2] === 'undefined' ? {'key': '', 'value': ''} : arguments[2],
+                    description = typeof arguments[3] === 'undefined' ? null : arguments[3];
 
                 var rowDom = $('<div>').addClass('row').css('margin-bottom', '15px'),
                     contianerDom = $('<div>').addClass('col-xs-12'),
@@ -549,7 +550,8 @@
                         .addClass('btn btn-default')
                         .attr('href', '####')
                         .html('<span class="glyphicon glyphicon-minus"></span>'),
-                    deleteButtonContainerDom = $('<span>').addClass('input-group-addon').css('border', 0).css('padding', 0);
+                    deleteButtonContainerDom = $('<span>').addClass('input-group-addon').css('border', 0).css('padding', 0),
+                    descriptionDom = $('<p>').addClass('help-block');
 
                 if (type === 'file') {
                     var valueInputDom = $('<input>').addClass('form-control')
@@ -581,6 +583,8 @@
                                 })
                             )
                         )
+                    ).append(
+                        description ? descriptionDom.html(description.replace(/\n/g, '<br />')).css('margin-bottom', '-10px') : ''
                     )
                 );
 
@@ -674,8 +678,23 @@
                             $('#addFileButton').show();
 
                             $('#paramsContainer').find(`a`).trigger('click');
+                            // {'params': {'key': {'type': 'text', 'value' => 'value', 'description': 'description'}}}
                             for (var i in api['params']) {
-                                $('#paramsContainer').append(inputDomRender('param', 'text', {'key': i, 'value': api['params'][i]}));
+                                if (typeof api['params'][i] === 'object') {
+                                    $('#paramsContainer').append(
+                                        inputDomRender(
+                                            'param',
+                                            api['params'][i]['type'],
+                                            {
+                                                'key': i,
+                                                'value': (typeof api['params'][i]['value'] !== 'undefined' ? api['params'][i]['value'] : ''),
+                                            },
+                                            (typeof api['params'][i]['description'] !== 'undefined' ? api['params'][i]['description'] : null)
+                                        )
+                                    );
+                                } else {
+                                    $('#paramsContainer').append(inputDomRender('param', 'text', {'key': i, 'value': api['params'][i]}));
+                                }
                             }
                             $('#paramsContainer').append(inputDomRender('param', 'text'));
 
