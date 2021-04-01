@@ -87,13 +87,15 @@
                         </div>
                     </form>
                     <label>Params</label>
-                    <form class="form-horizontal" id="paramsContainer"></form>
+                    <form class="form-horizontal" id="paramsContainer" onsubmit="$('#buttonForm').submit(); return false;">
+                        <button type="submit" style="display: none;"></button>
+                    </form>
 
                     <div id="stringContainer" style="border: 1px solid #ddd;" class="form-group">
                         <textarea class="form-control" id="stringToPost" placeholder="JSON / XML / URL Encoded String Here" rows="10"></textarea>
                     </div>
 
-                    <form class="form-horizontal" onsubmit="requestApi(this); return false;">
+                    <form class="form-horizontal" id="buttonForm" onsubmit="requestApi(this); return false;">
                         <button type="button" class="btn btn-default" style="margin-bottom: 15px;" id="addHeaderButton">Add Header</button>
                         <button type="button" class="btn btn-default" style="margin-bottom: 15px;" id="addParamButton">Add Param</button>
                         <button type="button" class="btn btn-default" style="margin-bottom: 15px;" id="addFileButton">Add File</button>
