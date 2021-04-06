@@ -100,14 +100,16 @@
                         <button type="submit" class="btn btn-primary" style="margin-bottom: 15px;">Submit</button>
                     </form>
                 </div>
-                <div class="col-md-8 col-lg-9">
-                    <label>Response Headers:</label>
-                    <div style="border: 1px solid #ddd;">
-                        <textarea id="responseHeader" style="width: 100%;" class="file-editor-textarea js-code-textarea"></textarea>
-                    </div>
-                    <label style="margin-top: 5px;">Response Body:</label>
-                    <div style="border: 1px solid #ddd;">
-                        <textarea id="responseBody" style="width: 100%;" class="file-editor-textarea js-code-textarea"></textarea>
+                <div class="fixedDivContainer">
+                    <div class="col-md-8 col-lg-9 col-md-push-4 col-lg-push-3 fixedDiv">
+                        <label>Response Headers:</label>
+                        <div style="border: 1px solid #ddd;">
+                            <textarea id="responseHeader" style="width: 100%;" class="file-editor-textarea js-code-textarea"></textarea>
+                        </div>
+                        <label style="margin-top: 5px;">Response Body:</label>
+                        <div style="border: 1px solid #ddd;">
+                            <textarea id="responseBody" style="width: 100%;" class="file-editor-textarea js-code-textarea"></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -138,13 +140,30 @@
             white-space: nowrap;
         }
 
+        .fixedDivContainer:after {
+            content: '';
+            display: table;
+            clear: both;
+        }
+
+        .fixedDivContainer {
+            *zoom: 1;
+        }
+
+        @media (min-width: 992px) {
+            .fixedDiv {
+                position: fixed;
+            }
+        }
+
         .footer {
-            position: absolute;
+            position: fixed;
             bottom: 0;
             width: 100%;
             /* Set the fixed height of the footer here */
             height: 50px;
             background-color: #f5f5f5;
+            z-index: 999;
         }
 
         .CodeMirror {
@@ -514,13 +533,15 @@
             $('#stringContainer').hide();
 
             $(window).resize(function(event) {
-                var baseHeight = window.innerHeight < document.getElementById('leftPanel').offsetHeight ? (document.getElementById('leftPanel').offsetHeight + 76) : window.innerHeight;
+                var baseHeight = window.innerHeight;
+                // var baseHeight = window.innerHeight < document.getElementById('leftPanel').offsetHeight ? (document.getElementById('leftPanel').offsetHeight + 76) : window.innerHeight;
                 var size = (baseHeight - 150 < 0 ? 300 : (baseHeight - 150) / 3);
                 responseHeaderCodeEditor.setSize(null, size + 'px');
                 responseBodyCodeEditor.setSize(null, (size * 2) + 'px');
             });
 
-            var baseHeight = window.innerHeight < (document.getElementById('leftPanel').offsetHeight + 98) ? (document.getElementById('leftPanel').offsetHeight + 174) : window.innerHeight;
+            var baseHeight = window.innerHeight;
+            // var baseHeight = window.innerHeight < (document.getElementById('leftPanel').offsetHeight + 98) ? (document.getElementById('leftPanel').offsetHeight + 174) : window.innerHeight;
             var size = (baseHeight - 150 < 0 ? 300 : (baseHeight - 150) / 3);
             responseHeaderCodeEditor.setSize(null, size + 'px');
             responseBodyCodeEditor.setSize(null, (size * 2) + 'px');
