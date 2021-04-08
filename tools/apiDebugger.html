@@ -703,20 +703,43 @@
                             $('#addFileButton').show();
 
                             $('#paramsContainer').find(`a`).trigger('click');
+                            $('#paramsContainer').find(`a`).trigger('click');
                             // {'params': {'key': {'type': 'text', 'value' => 'value', 'description': 'description'}}}
+                            // {'params': {'key': {'type': 'file', 'value' => 'value', 'description': 'description'}}}
+                            // {'params': {'key': {'type': 'array', 'value' => ['value1', 'value2'], 'description': 'description'}}}
                             for (var i in api['params']) {
                                 if (typeof api['params'][i] === 'object') {
-                                    $('#paramsContainer').append(
-                                        inputDomRender(
-                                            'param',
-                                            api['params'][i]['type'],
-                                            {
-                                                'key': i,
-                                                'value': (typeof api['params'][i]['value'] !== 'undefined' ? api['params'][i]['value'] : ''),
-                                            },
-                                            (typeof api['params'][i]['description'] !== 'undefined' ? api['params'][i]['description'] : null)
-                                        )
-                                    );
+                                    switch (api['params'][i]['type']) {
+                                        case 'file':
+                                        case 'text':
+                                            $('#paramsContainer').append(
+                                                inputDomRender(
+                                                    'param',
+                                                    api['params'][i]['type'],
+                                                    {
+                                                        'key': i,
+                                                        'value': (typeof api['params'][i]['value'] !== 'undefined' ? api['params'][i]['value'] : ''),
+                                                    },
+                                                    (typeof api['params'][i]['description'] !== 'undefined' ? api['params'][i]['description'] : null)
+                                                )
+                                            );
+                                            break;
+                                        case 'array':
+                                            for (var k in api['params'][i]['value']) {
+                                                $('#paramsContainer').append(
+                                                    inputDomRender(
+                                                        'param',
+                                                        'text',
+                                                        {
+                                                            'key': `${i}[]`,
+                                                            'value': api['params'][i]['value'][k],
+                                                        },
+                                                        (typeof api['params'][i]['description'] !== 'undefined' ? api['params'][i]['description'] : null)
+                                                    )
+                                                );
+                                            }
+                                            break;
+                                    }
                                 } else {
                                     $('#paramsContainer').append(inputDomRender('param', 'text', {'key': i, 'value': api['params'][i]}));
                                 }
