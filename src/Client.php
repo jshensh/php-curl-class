@@ -169,6 +169,56 @@ class Client extends Common
     }
 
     /**
+     * 多线程 Curl
+     * @access public
+     * @param array $clientArr CustomCurl\Client 的集合数组
+     * @return array
+     */
+    public static function multi($clientArr)
+    {
+        $result = [];
+        $mh = curl_multi_init();
+
+        $chArr = [];
+        $cookieJarArr = [];
+
+        foreach ($clientArr as $client) {
+            if ($client instanceof self) {
+                $ch = $client->getHandle();
+                $chArr[] = $ch;
+                $cookieJarArr[] = &$client->getCookieJar();
+                curl_multi_add_handle($mh, $ch);
+            }
+        }
+
+        $active = null;
+
+        do {
+            $mrc = curl_multi_exec($mh, $active);
+        } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+
+        while ($active && $mrc == CURLM_OK) {
+            if (curl_multi_select($mh) != -1) {
+                do {
+                    $mrc = curl_multi_exec($mh, $active);
+                } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+            }
+        }
+
+        foreach ($chArr as $i => $ch) {
+            $output = curl_multi_getcontent($ch);
+            $curlErrNo = curl_errno($ch);
+            if ($curlErrNo === 0 && $output) {
+                $result[$i] = new Statement(0, $ch, $output, $cookieJarArr[$i]);
+            } else {
+                $result[$i] = new Statement($curlErrNo, $ch, $output);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * 设置项
      * @access public
      * @param string $k 设置项 Key
@@ -348,14 +398,28 @@ class Client extends Common
      * @param array &$jar Cookie Jar 数组
      * @return $this
      */
-    public function cookieJar(&$jar)
+    public function cookieJar(&$jar = null)
     {
+        if ($jar === null && $this->cookieJarObj !== null) {
+            return $this->cookieJarObj;
+        }
+
         if (!is_array($jar) || count($jar) !== count($jar, 1)) {
             return $this;
         }
 
         $this->cookieJarObj = &$jar;
         return $this->setCookies($this->cookieJarObj, true);
+    }
+
+    /**
+     * 获取 Cookie Jar 的引用返回
+     * @access private
+     * @return array|null
+     */
+    private function &getCookieJar()
+    {
+        return $this->cookieJarObj;
     }
 
     /**
@@ -395,10 +459,10 @@ class Client extends Common
 
     /**
      * 获取 Curl 句柄
-     * @access public
+     * @access private
      * @return resource
      */
-    public function getHandle()
+    private function getHandle()
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);

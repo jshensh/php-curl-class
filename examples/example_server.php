@@ -1,6 +1,9 @@
 <?php
     setcookie('server', 'test');
-    setcookie('b', 'b', 1);
+    if (isset($_COOKIE['b'])) {
+        setcookie('c', 'b', time() + 5);
+    }
+    setcookie('b', 'b', time() + 5);
     $serv=$_SERVER;
     unset($serv["SCRIPT_FILENAME"]);
     unset($serv["CONTEXT_DOCUMENT_ROOT"]);

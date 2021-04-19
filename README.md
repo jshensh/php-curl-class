@@ -13,6 +13,7 @@ Custom Curl (嗯懒得取名字)
     - [Cookie 字符串/数组](#cookie-字符串数组)
     - [Header](#header)
     - [自定义 CurlOpt](#自定义-CurlOpt)
+    - [并发请求](#并发请求)
 - [设置项](#设置项)
 - [杂项](#杂项)
     - [多次请求同一地址](#多次请求同一地址)
@@ -173,6 +174,36 @@ if (!$curlObj->getStatus()) {
 }
 
 var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+```
+
+### 并发请求
+
+```php
+use CustomCurl\Client;
+
+$cookieJar = [[], [], []];
+
+$multiCurl = Client::multi([
+    Client::init('http://127.0.0.1/examples/example_server.php')->cookieJar($cookieJar),
+    Client::init('http://127.0.0.1/examples/example_server.php')->cookieJar($cookieJar),
+]);
+
+foreach ($multiCurl as $curlObj) {
+    var_dump($curlObj->getStatus(), $curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+}
+
+var_dump($cookieJar);
+
+$multiCurl = Client::multi([
+    Client::init('http://127.0.0.1/examples/example_server.php')->cookieJar($cookieJar),
+    Client::init('http://127.0.0.1/examples/example_server.php')->cookieJar($cookieJar),
+]);
+
+foreach ($multiCurl as $curlObj) {
+    var_dump($curlObj->getStatus(), $curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+}
+
+var_dump($cookieJar);
 ```
 
 ## 设置项

@@ -54,6 +54,7 @@ class Statement extends Common
             }
         }
         $cookieJarObj = self::mergeCookieJar($cookieJarObj, $this->responseCookies);
+        curl_close($ch);
     }
 
     /**
