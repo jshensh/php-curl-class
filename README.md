@@ -181,7 +181,7 @@ var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $cu
 ```php
 use CustomCurl\Client;
 
-$cookieJar = [[], [], []];
+$cookieJar = [];
 
 $multiCurl = Client::multi([
     Client::init('http://127.0.0.1/examples/example_server.php')->cookieJar($cookieJar),
