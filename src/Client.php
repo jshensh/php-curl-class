@@ -394,11 +394,11 @@ class Client extends Common
     }
 
     /**
-     * 执行 Curl
+     * 获取 Curl 句柄
      * @access public
-     * @return CustomCurl\Statement
+     * @return resource
      */
-    public function exec()
+    public function getHandle()
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
@@ -477,6 +477,18 @@ class Client extends Common
         foreach ($this->curlopt as $key => $value) {
             curl_setopt($ch, $key, $value);
         }
+
+        return $ch;
+    }
+
+    /**
+     * 执行 Curl
+     * @access public
+     * @return CustomCurl\Statement
+     */
+    public function exec()
+    {
+        $ch = $this->getHandle();
         $output = curl_exec($ch);
         $curlErrNo = curl_errno($ch);
         if ($curlErrNo === 0 || ($this->conf['ignoreCurlError'] && $output)) {
