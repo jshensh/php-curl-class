@@ -120,7 +120,7 @@ class Multi
                 } while ($mrc == CURLM_CALL_MULTI_PERFORM);
             }
 
-            if ($this->multiOptions['concurrency'] !== null && $active < $this->multiOptions['concurrency']) {
+            if ($reRequestPool || ($this->multiOptions['concurrency'] !== null && $active < $this->multiOptions['concurrency'])) {
                 $nextCh = $this->getCh();
                 $nextCh = $nextCh ? $nextCh : $this->getCh(array_shift($reRequestPool));
                 if ($nextCh) {
