@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | Custom Curl
 // +----------------------------------------------------------------------
-// | Copyright (c) 2020 http://233.imjs.work All rights reserved.
+// | Copyright (c) 2021 http://233.imjs.work All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( https://www.gnu.org/licenses/gpl-3.0.html )
 // +----------------------------------------------------------------------
@@ -13,6 +13,7 @@ namespace CustomCurl;
 
 use CustomCurl\Common;
 use CustomCurl\Statement;
+use CustomCurl\Multi;
 
 /**
  * Custom Curl 类
@@ -172,50 +173,13 @@ class Client extends Common
      * 多线程 Curl
      * @access public
      * @param array $clientArr CustomCurl\Client 的集合数组
+     * @param array $options 选项数组
      * @return array
      */
-    public static function multi($clientArr)
+    public static function multi($clientArr, $options = [])
     {
-        $result = [];
-        $mh = curl_multi_init();
-
-        $chArr = [];
-        $cookieJarArr = [];
-
-        foreach ($clientArr as $client) {
-            if ($client instanceof self) {
-                $ch = $client->getHandle();
-                $chArr[] = $ch;
-                $cookieJarArr[] = &$client->getCookieJar();
-                curl_multi_add_handle($mh, $ch);
-            }
-        }
-
-        $active = null;
-
-        do {
-            $mrc = curl_multi_exec($mh, $active);
-        } while ($mrc == CURLM_CALL_MULTI_PERFORM);
-
-        while ($active && $mrc == CURLM_OK) {
-            if (curl_multi_select($mh) != -1) {
-                do {
-                    $mrc = curl_multi_exec($mh, $active);
-                } while ($mrc == CURLM_CALL_MULTI_PERFORM);
-            }
-        }
-
-        foreach ($chArr as $i => $ch) {
-            $output = curl_multi_getcontent($ch);
-            $curlErrNo = curl_errno($ch);
-            if ($curlErrNo === 0 && $output) {
-                $result[$i] = new Statement(0, $ch, $output, $cookieJarArr[$i]);
-            } else {
-                $result[$i] = new Statement($curlErrNo, $ch, $output);
-            }
-        }
-
-        return $result;
+        $multi = new Multi($clientArr, $options);
+        return $multi->exec();
     }
 
     /**
@@ -276,6 +240,17 @@ class Client extends Common
         }
         $this->conf[$k] = $v;
         return $this;
+    }
+
+    /**
+     * 获取设置项
+     * @access public
+     * @param string $k 设置项 Key
+     * @return mixed
+     */
+    public function get($k)
+    {
+        return isset($this->conf[$k]) ? $this->conf[$k] : null;
     }
 
     /**
@@ -400,10 +375,6 @@ class Client extends Common
      */
     public function cookieJar(&$jar = null)
     {
-        if ($jar === null && $this->cookieJarObj !== null) {
-            return $this->cookieJarObj;
-        }
-
         if (!is_array($jar) || count($jar) !== count($jar, 1)) {
             return $this;
         }
@@ -413,18 +384,18 @@ class Client extends Common
     }
 
     /**
-     * 获取 Cookie Jar 的引用返回
-     * @access private
+     * 获取 Cookie Jar 的引用返回值
+     * @access public
      * @return array|null
      */
-    private function &getCookieJar()
+    public function &getCookieJar()
     {
         return $this->cookieJarObj;
     }
 
     /**
      * 创建 Multi Part 表单请求
-     * @access public
+     * @access private
      * @param array $fields 需要传输的表单内容（不含文件）
      * @return $this
      */
@@ -459,10 +430,10 @@ class Client extends Common
 
     /**
      * 获取 Curl 句柄
-     * @access private
+     * @access public
      * @return resource
      */
-    private function getHandle()
+    public function getHandle()
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);

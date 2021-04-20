@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | Custom Curl
 // +----------------------------------------------------------------------
-// | Copyright (c) 2020 http://233.imjs.work All rights reserved.
+// | Copyright (c) 2021 http://233.imjs.work All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( https://www.gnu.org/licenses/gpl-3.0.html )
 // +----------------------------------------------------------------------
@@ -19,8 +19,7 @@ use CustomCurl\Statement;
  */
 class Statement extends Common
 {
-    private $ch = null,
-            $output = '',
+    private $output = '',
             $body = '',
             $header = '',
             $responseCookies = [],
