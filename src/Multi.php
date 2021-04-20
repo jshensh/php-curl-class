@@ -88,7 +88,7 @@ class Multi
         $mh = curl_multi_init();
         $active = null;
 
-        for ($i = 0; $i < ($this->multiOptions['concurrency'] !== null ? $this->multiOptions['concurrency'] : count($clientArr)); $i++) {
+        for ($i = 0; $i < ($this->multiOptions['concurrency'] !== null ? $this->multiOptions['concurrency'] : count($this->clientArr)); $i++) {
             $ch = $this->getCh();
             if (!$ch) {
                 break;
