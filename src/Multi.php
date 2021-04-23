@@ -26,7 +26,7 @@ class Multi
             $clientArr = [],
             $chArr = [],
             $chDataArr = [],
-            $clientIndex = 0;
+            $chArrEndFlag = false;
 
     /**
      * 构造方法
@@ -44,20 +44,23 @@ class Multi
         }
 
         $this->multiOptions = array_merge($this->multiOptions, $options);
-        $this->clientArr = array_values($clientArr);
+        $this->clientArr = $clientArr;
     }
 
     /**
      * 获取 $clientArr 中的 Curl 句柄
      * @access private
-     * @param int $clientIndex 索引
+     * @param int|string $clientIndex 索引
      * @return resource
      */
     private function getCh($clientIndex = null)
     {
         if ($clientIndex === null) {
-            $clientIndex = $this->clientIndex;
-            $this->clientIndex++;
+            if ($this->chArrEndFlag) {
+                return false;
+            }
+            
+            $clientIndex = key($this->clientArr);
         }
 
         if (!isset($this->clientArr[$clientIndex])) {
@@ -74,6 +77,10 @@ class Multi
                 'code'      => null,
                 'reRequest' => $client->get('reRequest')
             ];
+        }
+
+        if (next($this->clientArr) === false) {
+            $this->chArrEndFlag = true;
         }
         return $this->chArr[$clientIndex];
     }
