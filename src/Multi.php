@@ -59,7 +59,7 @@ class Multi
             if ($this->chArrEndFlag) {
                 return false;
             }
-            
+
             $clientIndex = key($this->clientArr);
         }
 
@@ -94,6 +94,8 @@ class Multi
     {
         $mh = curl_multi_init();
         $active = null;
+
+        $result = [];
 
         for ($i = 0; $i < ($this->multiOptions['concurrency'] !== null ? $this->multiOptions['concurrency'] : count($this->clientArr)); $i++) {
             $ch = $this->getCh();
