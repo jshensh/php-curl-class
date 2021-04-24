@@ -115,12 +115,11 @@ class Multi
             if (curl_multi_select($mh) != -1) {
                 do {
                     $mrc = curl_multi_exec($mh, $active);
-                    $info = curl_multi_info_read($mh);
-                    if ($info !== false) {
+                    while ($info = curl_multi_info_read($mh)) {
                         $index = array_search($info['handle'], $this->chArr, true);
                         if ($index !== false) {
                             $this->chDataArr[$index]['reRequest']--;
-                            if ((int) $info['result'] && $this->chDataArr[$index]['reRequest'] > 0) {
+                            if (((int) $info['result'] || !curl_multi_getcontent($info['handle'])) && $this->chDataArr[$index]['reRequest'] > 0) {
                                 $reRequestPool[] = $index;
                             }
                             $this->chDataArr[$index]['code'] = (int) $info['result'];
