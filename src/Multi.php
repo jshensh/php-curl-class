@@ -121,6 +121,8 @@ class Multi
                             $this->chDataArr[$index]['reRequest']--;
                             if (((int) $info['result'] || !curl_multi_getcontent($info['handle'])) && $this->chDataArr[$index]['reRequest'] > 0) {
                                 $reRequestPool[] = $index;
+                                curl_multi_remove_handle($mh, $info['handle']);
+                                curl_close($info['handle']);
                             }
                             $this->chDataArr[$index]['code'] = (int) $info['result'];
                         }
@@ -141,6 +143,7 @@ class Multi
         foreach ($this->chArr as $i => $ch) {
             $output = curl_multi_getcontent($ch);
             $curlErrNo = $this->chDataArr[$i]['code'];
+            curl_multi_remove_handle($mh, $ch);
             if ($curlErrNo === 0 && $output) {
                 $result[$i] = new Statement(0, $ch, $output, $this->chDataArr[$i]['cookieJar']);
             } else {
