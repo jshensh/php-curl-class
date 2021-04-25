@@ -3,25 +3,6 @@ Custom Curl (嗯懒得取名字)
 
 对 PHP 自带 curl 的一个简单的封装，支持链式操作。
 
-## 目录
-
-- [使用示例](#使用示例)
-    - [GET 方法](#get-方法)
-    - [POST 方法](#post-方法)
-    - [POST 上传文件](#post-上传文件)
-    - [PUT 方法](#put-方法传输-json-数据)
-    - [Cookie 字符串/数组](#cookie-字符串数组)
-    - [Header](#header)
-    - [自定义 CurlOpt](#自定义-CurlOpt)
-    - [并发请求](#并发请求)
-- [设置项](#设置项)
-- [杂项](#杂项)
-    - [多次请求同一地址](#多次请求同一地址)
-    - [代理](#代理)
-    - [设置全局配置](#设置全局配置)
-    - [设置全局 CurlOpt 配置](#设置全局-CurlOpt-配置)
-
-
 ## 使用示例
 
 ### GET 方法
@@ -396,6 +377,69 @@ if (!$curlObj3->getStatus()) {
 var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), $curlObj3->getInfo());
 ```
 
+## Laravel / Lumen 支持
+
+### ApiDebugger
+
+#### 简介
+
+ApiDebugger 是一个简单的类似 Postman 的单页接口调试工具。
+
+CustomCurl 起初只是一个服务端的 Curl 封装，由于在随后的使用过程中发现，我们一般都用它来模拟请求其他业务的接口，甚至是[搭建反向代理](https://github.com/jshensh/phpReverseProxy)，于是就产生了对反向代理接口进行调试的需求，作为并不喜欢使用 Postman 的我就写了这个工具（后端狗用上世纪 jQuery 码的东西，不要笑）。
+
+因为浏览器限制，在一般情况下 ApiDebugger 只能调试当前域名下的所有资源，但我们可以通过在被调试目标上添加 ``Access-Control-Allow-Origin`` 等 Header 或者使用反向代理解决问题。
+
+#### 开始使用
+
+一般情况下，只要在 ``routes/web.php`` 中加入以下代码即可使用
+
+```php
+if (env('APP_DEBUG')) {
+    Route::get('/debugger', function () {
+        return view('CustomCurl::ApiDebugger');
+    });
+}
+```
+
+我们可以向 view 传递以下数据
+
+```php
+return view('CustomCurl::ApiDebugger', [
+    'loginUrl'  => '',                     // 登录接口的 url
+    'loginForm' => [                       // 登录表单
+        [
+            'key'         => 'username',
+            'label'       => 'Username',
+            'placeholder' => 'Username',
+            'value'       => 'admin',
+            'type'        => 'text'        // dom 的类型，可选值 [number, email, text, number, password, hidden, html]
+        ],
+        [
+            'key'         => 'password',
+            'label'       => 'Password',
+            'placeholder' => 'Password',
+            'value'       => 'password',
+            'type'        => 'password'
+        ],
+        [
+            'type' => 'html',
+            'html' => '<p>test</p>'        // 当 type 为 html 时，需要传入 html 值
+        ],
+    ],
+    'apiListUrl' => '/apilist',            // api 列表接口
+    'loginToken' => "data['access_token']" // 登录接口返回的 token 下标，接口需要返回 json 格式
+]);
+```
+
+#### 注册 Provider
+
+由于 Lumen 不具备 Laravel 的 Discovered Package 功能，所以我们在使用 Lumen 时，需要手动注册 Provider。
+
+请向 ``/bootstrap/app.php`` 中 ``Register Service Providers`` 代码段中添加以下代码：
+
+```php
+$app->register(CustomCurl\FrameworkSupport\Laravel\Providers\LoadViewsProvider::class);
+```
 
 ## 版权信息
 
