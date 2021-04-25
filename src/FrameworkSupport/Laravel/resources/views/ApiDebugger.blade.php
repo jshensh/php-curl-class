@@ -326,7 +326,7 @@
                         return false;
                     }
                     var data = JSON.parse(xhr.responseText);
-                    $('#token').val(data['access_token']);
+                    $('#token').val({{ $loginToken }});
                 }
             });
         };
