@@ -444,7 +444,7 @@ if (env('APP_DEBUG')) {
     Route::get('/debugger', function () {
         return view('CustomCurl::ApiDebugger');
     });
-    Route::get('/apilist', 'ApiListController@index');
+    Route::get('/apilist', [\App\Http\Controllers\ApiListController::class, 'index']);
 }
 ```
 

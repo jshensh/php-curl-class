@@ -20,7 +20,7 @@ class ApiListController extends Controller
     {
         $search = $request->input('search');
 
-        $domain = 'http://example.com/api';
+        $domain = '/api';
 
         $list = [
             [
