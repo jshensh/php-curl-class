@@ -23,22 +23,22 @@
                     <form onsubmit="loginApi(this); return false;">
                         <div class="form-group">
                             <label for="loginUrl">Login URL</label>
-                            <input type="text" class="form-control" id="loginUrl" placeholder="https://" value="{!! $loginUrl !!}">
+                            <input type="text" class="form-control" id="loginUrl" placeholder="https://" value="{{ $loginUrl }}">
                         </div>
 @foreach ($loginForm as $dom)
     @switch ($dom['type'])
         @case ('hidden')
-                        <input type="{{ $dom['type'] }}" name="{{ $dom['key'] }}" placeholder="{{ $dom['placeholder'] }}" value="{!! $dom['value'] !!}" />
+                        <input type="{{ $dom['type'] }}" name="{{ $dom['key'] }}" placeholder="{{ $dom['placeholder'] }}" value="{{ $dom['value'] }}" />
             @break
 
         @case ('html')
-                        {!! $dom['key'] !!}
+                        {!! $dom['html'] !!}
             @break
 
         @default
                         <div class="form-group">
                             <label for="{{ $dom['key'] }}">{{ $dom['label'] }}</label>
-                            <input type="{{ $dom['type'] }}" class="form-control" name="{{ $dom['key'] }}" id="{{ $dom['key'] }}" placeholder="{{ $dom['placeholder'] }}" value="{!! $dom['value'] !!}" />
+                            <input type="{{ $dom['type'] }}" class="form-control" name="{{ $dom['key'] }}" id="{{ $dom['key'] }}" placeholder="{{ $dom['placeholder'] }}" value="{{ $dom['value'] }}" />
                         </div>
     @endswitch
 @endforeach
@@ -326,7 +326,7 @@
                         return false;
                     }
                     var data = JSON.parse(xhr.responseText);
-                    $('#token').val({{ $loginToken }});
+                    $('#token').val({!! $loginToken !!});
                 }
             });
         };
