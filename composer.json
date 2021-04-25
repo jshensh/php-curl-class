@@ -24,5 +24,12 @@
         "psr-4": {
             "CustomCurl\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CustomCurl\\FrameworkSupport\\Laravel\\Providers\\LoadViewsProvider"
+            ]
+        }
     }
 }
