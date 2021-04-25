@@ -689,6 +689,7 @@
                 }
 
                 $('#headersContainer').find(`a`).trigger('click');
+                $('#header_content_type_value').val('').trigger('change');
                 for (var i in api['headers']) {
                     if (i === 'Content-Type') {
                         $('#header_content_type_value').val(api['headers'][i]).trigger('change');
@@ -701,76 +702,80 @@
 
                 $('#method').val(api['method']).change();
 
-                if (typeof api['headers']['Content-Type'] !== 'undefined') {
-                    switch (api['headers']['Content-Type']) {
-                        case '':
-                        case 'application/x-www-form-urlencoded':
-                            requestJsonCodeEditor.setValue('');
-                            $('#stringContainer').hide();
-                            $('#paramsContainer').show();
-                            $('#addParamButton').show();
-                            $('#addFileButton').show();
+                if (typeof api['headers'] === 'undefined' || typeof api['headers']['Content-Type'] === 'undefined') {
+                    var apiContentType = '';
+                } else {
+                    var apiContentType = api['headers']['Content-Type'];
+                }
 
-                            $('#paramsContainer').find(`a`).trigger('click');
-                            $('#paramsContainer').find(`a`).trigger('click');
-                            // {'params': {'key': {'type': 'text', 'value' => 'value', 'description': 'description'}}}
-                            // {'params': {'key': {'type': 'file', 'value' => 'value', 'description': 'description'}}}
-                            // {'params': {'key': {'type': 'array', 'value' => ['value1', 'value2'], 'description': 'description'}}}
-                            for (var i in api['params']) {
-                                if (typeof api['params'][i] === 'object') {
-                                    switch (api['params'][i]['type']) {
-                                        case 'file':
-                                        case 'text':
+                switch (apiContentType) {
+                    case '':
+                    case 'application/x-www-form-urlencoded':
+                        requestJsonCodeEditor.setValue('');
+                        $('#stringContainer').hide();
+                        $('#paramsContainer').show();
+                        $('#addParamButton').show();
+                        $('#addFileButton').show();
+
+                        $('#paramsContainer').find(`a`).trigger('click');
+                        $('#paramsContainer').find(`a`).trigger('click');
+                        // {'params': {'key': {'type': 'text', 'value' => 'value', 'description': 'description'}}}
+                        // {'params': {'key': {'type': 'file', 'value' => 'value', 'description': 'description'}}}
+                        // {'params': {'key': {'type': 'array', 'value' => ['value1', 'value2'], 'description': 'description'}}}
+                        for (var i in api['params']) {
+                            if (typeof api['params'][i] === 'object') {
+                                switch (api['params'][i]['type']) {
+                                    case 'file':
+                                    case 'text':
+                                        $('#paramsContainer').append(
+                                            inputDomRender(
+                                                'param',
+                                                api['params'][i]['type'],
+                                                {
+                                                    'key': i,
+                                                    'value': (typeof api['params'][i]['value'] !== 'undefined' ? api['params'][i]['value'] : ''),
+                                                },
+                                                (typeof api['params'][i]['description'] !== 'undefined' ? api['params'][i]['description'] : null)
+                                            )
+                                        );
+                                        break;
+                                    case 'array':
+                                        for (var k in api['params'][i]['value']) {
                                             $('#paramsContainer').append(
                                                 inputDomRender(
                                                     'param',
-                                                    api['params'][i]['type'],
+                                                    'text',
                                                     {
-                                                        'key': i,
-                                                        'value': (typeof api['params'][i]['value'] !== 'undefined' ? api['params'][i]['value'] : ''),
+                                                        'key': `${i}[]`,
+                                                        'value': api['params'][i]['value'][k],
                                                     },
                                                     (typeof api['params'][i]['description'] !== 'undefined' ? api['params'][i]['description'] : null)
                                                 )
                                             );
-                                            break;
-                                        case 'array':
-                                            for (var k in api['params'][i]['value']) {
-                                                $('#paramsContainer').append(
-                                                    inputDomRender(
-                                                        'param',
-                                                        'text',
-                                                        {
-                                                            'key': `${i}[]`,
-                                                            'value': api['params'][i]['value'][k],
-                                                        },
-                                                        (typeof api['params'][i]['description'] !== 'undefined' ? api['params'][i]['description'] : null)
-                                                    )
-                                                );
-                                            }
-                                            break;
-                                    }
-                                } else {
-                                    $('#paramsContainer').append(inputDomRender('param', 'text', {'key': i, 'value': api['params'][i]}));
+                                        }
+                                        break;
                                 }
+                            } else {
+                                $('#paramsContainer').append(inputDomRender('param', 'text', {'key': i, 'value': api['params'][i]}));
                             }
-                            $('#paramsContainer').append(inputDomRender('param', 'text'));
+                        }
+                        $('#paramsContainer').append(inputDomRender('param', 'text'));
 
-                            break;
-                        case 'application/octet-stream':
-                            requestJsonCodeEditor.setValue(api['params']);
-                            $('#stringContainer').show();
-                            $('#paramsContainer').hide();
-                            $('#addParamButton').hide();
-                            $('#addFileButton').hide();
-                            break;
-                        default:
-                            requestJsonCodeEditor.setValue(JSON.stringify(api['params'], null, "    "));
-                            $('#stringContainer').show();
-                            $('#paramsContainer').hide();
-                            $('#addParamButton').hide();
-                            $('#addFileButton').hide();
-                            break;
-                    }
+                        break;
+                    case 'application/octet-stream':
+                        requestJsonCodeEditor.setValue(api['params']);
+                        $('#stringContainer').show();
+                        $('#paramsContainer').hide();
+                        $('#addParamButton').hide();
+                        $('#addFileButton').hide();
+                        break;
+                    default:
+                        requestJsonCodeEditor.setValue(JSON.stringify(api['params'], null, "    "));
+                        $('#stringContainer').show();
+                        $('#paramsContainer').hide();
+                        $('#addParamButton').hide();
+                        $('#addFileButton').hide();
+                        break;
                 }
 
                 $('#apiUrl').val(api['url']);
