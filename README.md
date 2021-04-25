@@ -381,8 +381,6 @@ var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), 
 
 ### ApiDebugger
 
-#### 简介
-
 ApiDebugger 是一个简单的类似 Postman 的单页接口调试工具。
 
 CustomCurl 起初只是一个服务端的 Curl 封装，由于在随后的使用过程中发现，我们一般都用它来模拟请求其他业务的接口，甚至是[搭建反向代理](https://github.com/jshensh/phpReverseProxy)，于是就产生了对反向代理接口进行调试的需求，作为并不喜欢使用 Postman 的我就写了这个工具（后端狗用上世纪 jQuery 码的东西，不要笑）。
