@@ -14,7 +14,7 @@ class LoadViewsProvider extends ServiceProvider
      */
     public function boot()
     {
-        var_dump(1);
+        Illuminate\Support\Facades\Log::debug(__DIR__ . '../resources/views');
         $this->loadViewsFrom(__DIR__ . '../resources/views', 'CustomCurl');
 
         View::composer('CustomCurl::ApiDebugger', function ($view) {
@@ -38,7 +38,7 @@ class LoadViewsProvider extends ServiceProvider
                 ],
                 'apiListUrl' => '/apilist',
                 'loginToken' => "data['access_token']"
-            ]
+            ];
 
             foreach ($defaultOptions as $key => $value) {
                 if (!$view->__isset($key)) {
