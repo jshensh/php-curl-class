@@ -45,5 +45,9 @@ class LoadViewsProvider extends ServiceProvider
                 }
             }
         });
+
+        $this->publishes([
+            __DIR__.'/../Http/Controller/ApiListController.php' => app_path('Http/Controllers/ApiListController.php')
+        ], 'ApiDebugger');
     }
 }

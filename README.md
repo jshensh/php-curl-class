@@ -403,7 +403,7 @@ if (env('APP_DEBUG')) {
 
 ```php
 return view('CustomCurl::ApiDebugger', [
-    'loginUrl'  => '',                     // 登录接口的 url
+    'loginUrl'  => '',                     // 登录接口的 url，接口需要以 json 格式返回 token
     'loginForm' => [                       // 登录表单
         [
             'key'         => 'username',
@@ -421,19 +421,38 @@ return view('CustomCurl::ApiDebugger', [
         ],
         [
             'type' => 'html',
-            'html' => '<p>test</p>'        // 当 type 为 html 时，需要传入 html 值
+            'html' => '<p>test</p>'        // 当 type 为 html 时，需要传入 html 的内容
         ],
     ],
     'apiListUrl' => '/apilist',            // api 列表接口
-    'loginToken' => "data['access_token']" // 登录接口返回的 token 下标，接口需要返回 json 格式
+    'loginToken' => "data['access_token']" // 登录接口返回的 token 下标
 ]);
+```
+
+#### 预置 Api 列表
+
+向 ``app/Http/Controller`` 目录发布 ``ApiListController.php``
+
+```php
+php artisan vendor:publish --tag=ApiDebugger
+```
+
+在之前的基础上继续设置路由
+
+```php
+if (env('APP_DEBUG')) {
+    Route::get('/debugger', function () {
+        return view('CustomCurl::ApiDebugger');
+    });
+    Route::get('/apilist', 'ApiListController@index');
+}
 ```
 
 #### 注册 Provider
 
 由于 Lumen 不具备 Laravel 的 Discovered Package 功能，所以我们在使用 Lumen 时，需要手动注册 Provider。
 
-请向 ``/bootstrap/app.php`` 中 ``Register Service Providers`` 代码段中添加以下代码：
+请向 ``/bootstrap/app.php`` 中 ``Register Service Providers`` 代码段中添加以下代码
 
 ```php
 $app->register(CustomCurl\FrameworkSupport\Laravel\Providers\LoadViewsProvider::class);
