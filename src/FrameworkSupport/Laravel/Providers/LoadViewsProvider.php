@@ -14,7 +14,6 @@ class LoadViewsProvider extends ServiceProvider
      */
     public function boot()
     {
-        Illuminate\Support\Facades\Log::debug(__DIR__ . '../resources/views');
         $this->loadViewsFrom(__DIR__ . '../resources/views', 'CustomCurl');
 
         View::composer('CustomCurl::ApiDebugger', function ($view) {
