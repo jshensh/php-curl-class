@@ -448,6 +448,8 @@ if (env('APP_DEBUG')) {
 }
 ```
 
+由于 Lumen 不支持 ``vendor:publish`` 操作，请手动将 [ApiListController.php](https://github.com/jshensh/php-curl-class/blob/master/src/FrameworkSupport/Laravel/Http/Controller/ApiListController.php) 复制至对应目录
+
 #### 注册 Provider
 
 由于 Lumen 不具备 Laravel 的 Discovered Package 功能，所以我们在使用 Lumen 时，需要手动注册 Provider。
