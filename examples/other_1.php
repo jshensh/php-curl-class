@@ -2,7 +2,7 @@
 use CustomCurl\Client;
 
 $curlSet1 = Client::init('http://127.0.0.1/examples/example_server.php')
-                ->set('referer', 'http://google.com');
+    ->set('referer', 'http://google.com');
 
 $curlSet2 = clone $curlSet1;
 

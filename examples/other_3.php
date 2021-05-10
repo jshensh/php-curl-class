@@ -20,8 +20,8 @@ Client::setConf('postFieldsBuildQuery', false);
 Client::setConf('postFieldsMultiPart', true);
 
 $curlObj0 = Client::init('http://127.0.0.1/examples/example_server.php')
-                ->set('userAgent', 'Test')
-                ->exec();
+    ->set('userAgent', 'Test')
+    ->exec();
 
 if (!$curlObj0->getStatus()) {
     throw new \Exception('Curl Error', $curlObj0->getCurlErrNo());

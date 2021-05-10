@@ -287,6 +287,11 @@ class Client extends Common
                     return $this;
                 }
                 break;
+            case CURLOPT_WRITEFUNCTION:
+                if (!($v instanceof \Closure)) {
+                    return $this;
+                }
+                break;
             default:
                 return $this;
         }

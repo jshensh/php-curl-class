@@ -7,8 +7,8 @@ Client::setCurlOptConf(CURLOPT_ENCODING, 'gzip');       // CURLOPT_ENCODING，�
 // 以上为所有可修改的全局 CurlOpt 配置项
 
 $curlObj0 = Client::init('http://127.0.0.1/examples/example_server.php')
-            ->setCurlOpt(CURLOPT_ENCODING, '') // 在当前会话中覆盖预设值
-            ->exec();
+    ->setCurlOpt(CURLOPT_ENCODING, '') // 在当前会话中覆盖预设值
+    ->exec();
 
 if ($curlObj0->getStatus()) {
     var_dump($curlObj0->getHeader(), $curlObj0->getCookies(), $curlObj0->getBody(), $curlObj0->getInfo());

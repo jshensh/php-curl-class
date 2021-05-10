@@ -25,8 +25,8 @@ var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $cu
 use CustomCurl\Client;
 
 $curlObj = Client::init('http://www.w3school.com.cn/example/php/demo_php_global_post.php', 'post')
-            ->set('postFields', ['fname' => 'jshensh'])
-            ->exec();
+    ->set('postFields', ['fname' => 'jshensh'])
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -41,13 +41,13 @@ var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $cu
 use CustomCurl\Client;
 
 $curlObj = Client::init('http://127.0.0.1/examples/example_server.php', 'post')
-            ->set('postFields', [
-                'fname'    => 'jshensh',
-                'files[0]' => new CURLFile('./README.md'),
-                'files[1]' => new CURLFile('LICENSE')
-            ])
-            ->set('postFieldsBuildQuery', false)    // postFieldsBuildQuery 设置为 True 时，将对 postFields 进行 http_build_query，避免出现跨语言无法 POST 数据的问题。如需上传文件则需要将该项设置为 False。
-            ->exec();
+    ->set('postFields', [
+        'fname'    => 'jshensh',
+        'files[0]' => new CURLFile('./README.md'),
+        'files[1]' => new CURLFile('LICENSE')
+    ])
+    ->set('postFieldsBuildQuery', false)    // postFieldsBuildQuery 设置为 True 时，将对 postFields 进行 http_build_query，避免出现跨语言无法 POST 数据的问题。如需上传文件则需要将该项设置为 False。
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -62,10 +62,10 @@ var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $cu
 use CustomCurl\Client;
 
 $curlObj = Client::init('http://lab.imjs.work/server.php', 'put')
-            ->set('postFields', ['fname' => 'jshensh']) // 可以传入数组
-            ->set('postFields', '{"fname": "jshensh"}') // 也可以直接传入 json 字符串
-            ->set('postType', 'json')
-            ->exec();
+    ->set('postFields', ['fname' => 'jshensh']) // 可以传入数组
+    ->set('postFields', '{"fname": "jshensh"}') // 也可以直接传入 json 字符串
+    ->set('postType', 'json')
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -81,11 +81,11 @@ use CustomCurl\Client;
 
 $cookieJar = [];
 $curlObj = Client::init('http://example.com')
-            ->cookieJar($cookieJar)   // 设置 CookieJar，类似于 CURLOPT_COOKIEJAR，可在多次交互过程中自动存取 Cookies
-            ->setCookie('a', 'b')     // 设置 Cookie，Key => Value
-            ->clearCookies()          // 清空之前设置的所有 Cookie
-            ->setCookie('b', 'c')     // 重新设置 Cookie，Key => Value
-            ->exec();
+    ->cookieJar($cookieJar)   // 设置 CookieJar，类似于 CURLOPT_COOKIEJAR，可在多次交互过程中自动存取 Cookies
+    ->setCookie('a', 'b')     // 设置 Cookie，Key => Value
+    ->clearCookies()          // 清空之前设置的所有 Cookie
+    ->setCookie('b', 'c')     // 重新设置 Cookie，Key => Value
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -100,13 +100,13 @@ var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $cu
 use CustomCurl\Client;
 
 $curlObj = Client::init('http://example.com')
-            ->setCookie('a', 'b')             // 设置 Cookie，Key => Value
-            ->setCookies('b=c; c=d')          // 传入字符串设置 Cookie，之前设置的 cookie 失效
-            ->setCookies('d=e; c=f', true)    // 传入字符串追加设置 Cookie，Key 相同的 cookie 将会被覆盖
-            ->setCookies(['e' => 'f'], true)  // 传入数组追加设置 Cookie，只允许传入一维数组
-            ->setCookies(['e' => ['f', 'g']]) // 传入二维数组将忽略
-            ->setCookies('dsjdhs')            // 传入不合法字符串将忽略
-            ->exec();
+    ->setCookie('a', 'b')             // 设置 Cookie，Key => Value
+    ->setCookies('b=c; c=d')          // 传入字符串设置 Cookie，之前设置的 cookie 失效
+    ->setCookies('d=e; c=f', true)    // 传入字符串追加设置 Cookie，Key 相同的 cookie 将会被覆盖
+    ->setCookies(['e' => 'f'], true)  // 传入数组追加设置 Cookie，只允许传入一维数组
+    ->setCookies(['e' => ['f', 'g']]) // 传入二维数组将忽略
+    ->setCookies('dsjdhs')            // 传入不合法字符串将忽略
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -121,10 +121,10 @@ var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $cu
 use CustomCurl\Client;
 
 $curlObj = Client::init('http://example.com/api')
-            ->setHeader('X-PJAX', 'true')                         // 设置 Header，Key => Value
-            ->clearHeaders()                                      // 清空之前设置的所有 Header
-            ->setHeader('X-Requested-With', 'XMLHttpRequest')     // 设置 Header，Key => Value
-            ->exec();
+    ->setHeader('X-PJAX', 'true')                         // 设置 Header，Key => Value
+    ->clearHeaders()                                      // 清空之前设置的所有 Header
+    ->setHeader('X-Requested-With', 'XMLHttpRequest')     // 设置 Header，Key => Value
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -138,17 +138,34 @@ var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $cu
 ```php
 use CustomCurl\Client;
 
+$headerSize = -1;
+
 $curlObj = Client::init('http://example.com')
-            ->setCurlOpt(CURLOPT_SSL_VERIFYPEER, true)                       // CURLOPT_SSL_VERIFYPEER，默认值 False
-            ->setCurlOpt(CURLOPT_SSL_VERIFYHOST, true)                       // CURLOPT_SSL_VERIFYHOST，默认值 False
-            ->setCurlOpt(CURLOPT_ENCODING, '')                               // CURLOPT_ENCODING，默认值 ''
-            ->setCurlOpt(CURLOPT_SSLCERT, dirname(__FILE__) . '/client.crt') // CURLOPT_SSLCERT，SSL 双向认证证书路径
-            ->setCurlOpt(CURLOPT_SSLKEYPASSWD, '')                           // CURLOPT_SSLKEYPASSWD，证书需要的密码
-            ->setCurlOpt(CURLOPT_SSLCERTTYPE, 'PEM')                         // CURLOPT_SSLCERTTYPE，证书的类型，支持的格式有 "PEM" (默认值), "DER" 和 "ENG"
-            ->setCurlOpt(CURLOPT_SSLKEY, dirname(__FILE__) . '/client.key')  // CURLOPT_SSLKEY，SSL 双向认证证书的私钥
-            ->setCurlOpt(CURLOPT_SSLKEYPASSWD, '')                           // CURLOPT_SSLKEYPASSWD，CURLOPT_SSLKEY 私钥的密码
-            ->setCurlOpt(CURLOPT_SSLKEYTYPE, 'PEM')                          // CURLOPT_SSLKEYTYPE，私钥的加密类型，支持的密钥类型为 "PEM"(默认值)、"DER" 和 "ENG"
-            ->exec();
+    ->setCurlOpt(CURLOPT_SSL_VERIFYPEER, true)                                    // CURLOPT_SSL_VERIFYPEER，默认值 False
+    ->setCurlOpt(CURLOPT_SSL_VERIFYHOST, true)                                    // CURLOPT_SSL_VERIFYHOST，默认值 False
+    ->setCurlOpt(CURLOPT_ENCODING, '')                                            // CURLOPT_ENCODING，默认值 ''
+    ->setCurlOpt(CURLOPT_SSLCERT, dirname(__FILE__) . '/client.crt')              // CURLOPT_SSLCERT，SSL 双向认证证书路径
+    ->setCurlOpt(CURLOPT_SSLKEYPASSWD, '')                                        // CURLOPT_SSLKEYPASSWD，证书需要的密码
+    ->setCurlOpt(CURLOPT_SSLCERTTYPE, 'PEM')                                      // CURLOPT_SSLCERTTYPE，证书的类型，支持的格式有 "PEM" (默认值), "DER" 和 "ENG"
+    ->setCurlOpt(CURLOPT_SSLKEY, dirname(__FILE__) . '/client.key')               // CURLOPT_SSLKEY，SSL 双向认证证书的私钥
+    ->setCurlOpt(CURLOPT_SSLKEYPASSWD, '')                                        // CURLOPT_SSLKEYPASSWD，CURLOPT_SSLKEY 私钥的密码
+    ->setCurlOpt(CURLOPT_SSLKEYTYPE, 'PEM')                                       // CURLOPT_SSLKEYTYPE，私钥的加密类型，支持的密钥类型为 "PEM"(默认值)、"DER" 和 "ENG"
+    ->setCurlOpt(CURLOPT_WRITEFUNCTION, function($ch, $data) use (&$headerSize) { // CURLOPT_WRITEFUNCTION，下载时的回调函数，通常用于反向代理即时传输数据
+        $info = curl_getinfo($ch);
+        if ($headerSize < $info['header_size']) {
+            $headerSize = $info['header_size'];
+            if ($data === "\r\n") {
+                $headerSize += 2;
+            }
+            header($data, false);
+        } else {
+            echo $data;
+        }
+        ob_flush();
+        flush();
+        return strlen($data);
+    })
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -197,19 +214,19 @@ var_dump($cookieJar);
 use CustomCurl\Client;
 
 $curlObj = Client::init('http://cn.bing.com')
-            ->set('referer', 'http://google.com')       // 设置 HTTP REFERER
-            ->set('ignoreCurlError', 1)                 // 忽略 Curl 错误，默认值 False
-            ->set('timeout', 1)                         // CURLOPT_TIMEOUT，单位秒，默认值 5
-            ->set('reRequest', 1)                       // 遇到错误时重新尝试的次数，默认值 3
-            ->set('postFields', ['fname' => 'jshensh']) // POST 提交参数，数组
-            ->set('postType', 'json')                   // 提交方式，可选 ['form', 'json', 'string']，默认值 'form'
-            ->set('followLocation', 1)                  // CURLOPT_FOLLOWLOCATION，默认值 False
-            ->set('autoRefer', 1)                       // CURLOPT_AUTOREFERER，默认值 True
-            ->set('maxRedirs', 1)                       // CURLOPT_MAXREDIRS，默认值 3
-            ->set('userAgent', 'Mozilla')               // CURLOPT_USERAGENT
-            ->set('postFieldsBuildQuery', false)        // POST 时是否 build 成字符串传递，默认值 true
-            ->set('postFieldsMultiPart', true)          // POST 时是否以 multipart/form-data 传递，优先级高于 postFieldsBuildQuery，默认值 false
-            ->exec();
+    ->set('referer', 'http://google.com')       // 设置 HTTP REFERER
+    ->set('ignoreCurlError', 1)                 // 忽略 Curl 错误，默认值 False
+    ->set('timeout', 1)                         // CURLOPT_TIMEOUT，单位秒，默认值 5
+    ->set('reRequest', 1)                       // 遇到错误时重新尝试的次数，默认值 3
+    ->set('postFields', ['fname' => 'jshensh']) // POST 提交参数，数组
+    ->set('postType', 'json')                   // 提交方式，可选 ['form', 'json', 'string']，默认值 'form'
+    ->set('followLocation', 1)                  // CURLOPT_FOLLOWLOCATION，默认值 False
+    ->set('autoRefer', 1)                       // CURLOPT_AUTOREFERER，默认值 True
+    ->set('maxRedirs', 1)                       // CURLOPT_MAXREDIRS，默认值 3
+    ->set('userAgent', 'Mozilla')               // CURLOPT_USERAGENT
+    ->set('postFieldsBuildQuery', false)        // POST 时是否 build 成字符串传递，默认值 true
+    ->set('postFieldsMultiPart', true)          // POST 时是否以 multipart/form-data 传递，优先级高于 postFieldsBuildQuery，默认值 false
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -252,11 +269,11 @@ var_dump($curlObj2->getHeader(), $curlObj2->getCookies(), $curlObj2->getBody(), 
 use CustomCurl\Client;
 
 $curlObj = Client::init('http://example.com')
-            ->set('proxy', '127.0.0.1')                    // 代理地址
-            ->set('proxyPort', 8080)                       // 代理端口，默认 8080
-            ->set('proxyUserPwd', '[username]:[password]') // 代理用户名密码，默认不设置
-            ->set('proxyType', CURLPROXY_HTTP)             // 代理类型，可选 [CURLPROXY_HTTP, CURLPROXY_SOCKS4, CURLPROXY_SOCKS5, CURLPROXY_SOCKS4A, CURLPROXY_SOCKS5_HOSTNAME]，默认 CURLPROXY_HTTP，传入常量，不要加引号
-            ->exec();
+    ->set('proxy', '127.0.0.1')                    // 代理地址
+    ->set('proxyPort', 8080)                       // 代理端口，默认 8080
+    ->set('proxyUserPwd', '[username]:[password]') // 代理用户名密码，默认不设置
+    ->set('proxyType', CURLPROXY_HTTP)             // 代理类型，可选 [CURLPROXY_HTTP, CURLPROXY_SOCKS4, CURLPROXY_SOCKS5, CURLPROXY_SOCKS4A, CURLPROXY_SOCKS5_HOSTNAME]，默认 CURLPROXY_HTTP，传入常量，不要加引号
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
@@ -290,8 +307,8 @@ Client::setConf('postFieldsMultiPart', true);             // POST 时是否以 m
 // 以上为所有可修改的全局配置项
 
 $curlObj = Client::init('http://lab.imjs.work/server.php')
-            ->set('userAgent', 'Test') // 在当前会话中覆盖预设值
-            ->exec();
+    ->set('userAgent', 'Test') // 在当前会话中覆盖预设值
+    ->exec();
 
 if (!$curlObj->getStatus()) {
     throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
