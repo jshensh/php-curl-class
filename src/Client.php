@@ -288,7 +288,7 @@ class Client extends Common
                 }
                 break;
             case CURLOPT_WRITEFUNCTION:
-                if (!($v instanceof \Closure)) {
+                if (!($v instanceof \Closure || is_array($v))) {
                     return $this;
                 }
                 break;
