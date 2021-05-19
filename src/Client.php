@@ -43,7 +43,9 @@ class Client extends Common
             $defaultCurlopt = [
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_ENCODING       => ''
+                CURLOPT_ENCODING       => '',
+                CURLOPT_NOBODY         => false,
+                CURLOPT_HEADER         => true
             ],
             $userConf = [],
             $userCurlopt = [];
@@ -266,6 +268,10 @@ class Client extends Common
             case CURLOPT_SSL_VERIFYPEER:
                 // no break
             case CURLOPT_SSL_VERIFYHOST:
+                // no break
+            case CURLOPT_NOBODY:
+                // no break
+            case CURLOPT_HEADER:
                 if (!is_bool($v)) {
                     return $this;
                 }
@@ -512,8 +518,6 @@ class Client extends Common
             }
             curl_setopt($ch, CURLOPT_PROXYTYPE, $this->conf['proxyType']);
         }
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_NOBODY, false);
         foreach ($this->curlopt as $key => $value) {
             curl_setopt($ch, $key, $value);
         }
