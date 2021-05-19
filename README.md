@@ -143,6 +143,8 @@ $headerSize = -1;
 $curlObj = Client::init('http://example.com')
     ->setCurlOpt(CURLOPT_SSL_VERIFYPEER, true)                                    // CURLOPT_SSL_VERIFYPEER，默认值 False
     ->setCurlOpt(CURLOPT_SSL_VERIFYHOST, true)                                    // CURLOPT_SSL_VERIFYHOST，默认值 False
+    ->setCurlOpt(CURLOPT_NOBODY, false)                                           // CURLOPT_NOBODY，默认值 False
+    ->setCurlOpt(CURLOPT_HEADER, true)                                            // CURLOPT_HEADER，默认值 True
     ->setCurlOpt(CURLOPT_ENCODING, '')                                            // CURLOPT_ENCODING，默认值 ''
     ->setCurlOpt(CURLOPT_SSLCERT, dirname(__FILE__) . '/client.crt')              // CURLOPT_SSLCERT，SSL 双向认证证书路径
     ->setCurlOpt(CURLOPT_SSLKEYPASSWD, '')                                        // CURLOPT_SSLKEYPASSWD，证书需要的密码
