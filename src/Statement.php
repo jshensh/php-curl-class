@@ -25,6 +25,7 @@ class Statement extends Common
             $responseCookies = [],
             $curlInfo = [],
             $curlErrNo = 0,
+            $curlErr = null,
             $status = false;
 
     /**
@@ -39,6 +40,7 @@ class Statement extends Common
     public function __construct($curlErrNo, $ch, $output, &$cookieJarObj = []) {
         if ($curlErrNo !== 0) {
             $this->curlErrNo = $curlErrNo;
+            $this->curlErr = curl_error($ch);
             return;
         }
         $this->status = true;
@@ -94,6 +96,16 @@ class Statement extends Common
     public function getCurlErrNo()
     {
         return $this->curlErrNo;
+    }
+
+    /**
+     * 获取 Curl 错误内容
+     * @access public
+     * @return string|null
+     */
+    public function getCurlErr()
+    {
+        return $this->curlErr;
     }
 
     /**
