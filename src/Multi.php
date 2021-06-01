@@ -25,8 +25,18 @@ class Multi
             ],
             $clientArr = [],
             $chArr = [],
-            $chDataArr = [],
-            $chArrEndFlag = false;
+            $chGenerator = null,
+            $chDataArr = [];
+
+    /**
+     * 获取 $this->chArr 的生成器
+     * @access private
+     * @return \Generator
+     */
+    private function getChGenerator()
+    {
+        yield from $this->clientArr;
+    }
 
     /**
      * 构造方法
@@ -45,6 +55,7 @@ class Multi
 
         $this->multiOptions = array_merge($this->multiOptions, $options);
         $this->clientArr = $clientArr;
+        $this->chGenerator = $this->getChGenerator();
     }
 
     /**
@@ -56,11 +67,11 @@ class Multi
     private function getCh($clientIndex = null)
     {
         if ($clientIndex === null) {
-            if ($this->chArrEndFlag) {
+            if (!$this->chGenerator->valid()) {
                 return false;
             }
 
-            $clientIndex = key($this->clientArr);
+            $clientIndex = $this->chGenerator->key();
         }
 
         if (!isset($this->clientArr[$clientIndex])) {
@@ -79,23 +90,19 @@ class Multi
             ];
         }
 
-        if (next($this->clientArr) === false) {
-            $this->chArrEndFlag = true;
-        }
+        $this->chGenerator->next();
         return $this->chArr[$clientIndex];
     }
 
     /**
      * 执行多线程请求
      * @access public
-     * @return array
+     * @return \Generator
      */
-    public function exec()
+    public function cursor()
     {
         $mh = curl_multi_init();
         $active = null;
-
-        $result = [];
 
         for ($i = 0; $i < ($this->multiOptions['concurrency'] !== null ? $this->multiOptions['concurrency'] : count($this->clientArr)); $i++) {
             $ch = $this->getCh();
@@ -119,12 +126,20 @@ class Multi
                         $index = array_search($info['handle'], $this->chArr, true);
                         if ($index !== false) {
                             $this->chDataArr[$index]['reRequest']--;
-                            if (((int) $info['result'] || !curl_multi_getcontent($info['handle'])) && $this->chDataArr[$index]['reRequest'] > 0) {
-                                $reRequestPool[] = $index;
+                            $output = curl_multi_getcontent($info['handle']);
+                            if ((int) $info['result'] || !$output) {
                                 curl_multi_remove_handle($mh, $info['handle']);
-                                curl_close($info['handle']);
+                                if ($this->chDataArr[$index]['reRequest'] > 0) {
+                                    curl_close($info['handle']);
+                                    curl_multi_add_handle($mh, $this->getCh($index));
+                                    $mrc = curl_multi_exec($mh, $active);
+                                } else {
+                                    yield $index => new Statement((int) $info['result'], $info['handle'], $output);
+                                }
+                            } else {
+                                curl_multi_remove_handle($mh, $info['handle']);
+                                yield $index => new Statement(0, $info['handle'], $output, $this->chDataArr[$index]['cookieJar']);
                             }
-                            $this->chDataArr[$index]['code'] = (int) $info['result'];
                         }
                     }
                 } while ($mrc == CURLM_CALL_MULTI_PERFORM);
@@ -132,7 +147,6 @@ class Multi
 
             if ($reRequestPool || ($this->multiOptions['concurrency'] !== null && $active < $this->multiOptions['concurrency'])) {
                 $nextCh = $this->getCh();
-                $nextCh = $nextCh ? $nextCh : $this->getCh(array_shift($reRequestPool));
                 if ($nextCh) {
                     curl_multi_add_handle($mh, $nextCh);
                     $mrc = curl_multi_exec($mh, $active);
@@ -140,17 +154,6 @@ class Multi
             }
         }
 
-        foreach ($this->chArr as $i => $ch) {
-            $output = curl_multi_getcontent($ch);
-            $curlErrNo = $this->chDataArr[$i]['code'];
-            curl_multi_remove_handle($mh, $ch);
-            if ($curlErrNo === 0 && $output) {
-                $result[$i] = new Statement(0, $ch, $output, $this->chDataArr[$i]['cookieJar']);
-            } else {
-                $result[$i] = new Statement($curlErrNo, $ch, $output);
-            }
-        }
-
-        return $result;
+        return true;
     }
 }

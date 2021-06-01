@@ -176,12 +176,12 @@ class Client extends Common
      * @access public
      * @param array $clientArr CustomCurl\Client 的集合数组
      * @param array $options 选项数组
-     * @return array
+     * @return \Generator
      */
     public static function multi($clientArr, $options = [])
     {
         $multi = new Multi($clientArr, $options);
-        return $multi->exec();
+        return $multi->cursor();
     }
 
     /**

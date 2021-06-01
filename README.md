@@ -192,9 +192,11 @@ $multiCurl = Client::multi([
     'test8' => Client::init('http://127.0.0.1/examples/example_server.php')->cookieJar($cookieJar),
 ], ['concurrency' => 3]);
 
-foreach ($multiCurl as $curlObj) {
-    var_dump($curlObj->getStatus(), $curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+foreach ($multiCurl as $k => $curlObj) {
+    var_dump($k, $curlObj->getStatus(), $curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 }
+
+var_dump($multiCurl->getReturn());
 
 var_dump($cookieJar);
 
@@ -203,9 +205,11 @@ $multiCurl = Client::multi([
     Client::init('http://127.0.0.1/examples/example_server.php')->cookieJar($cookieJar),
 ]);
 
-foreach ($multiCurl as $curlObj) {
-    var_dump($curlObj->getStatus(), $curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+foreach ($multiCurl as $k => $curlObj) {
+    var_dump($k, $curlObj->getStatus(), $curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 }
+
+var_dump($multiCurl->getReturn());
 
 var_dump($cookieJar);
 ```
