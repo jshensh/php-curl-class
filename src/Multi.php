@@ -127,8 +127,8 @@ class Multi
                         if ($index !== false) {
                             $this->chDataArr[$index]['reRequest']--;
                             $output = curl_multi_getcontent($info['handle']);
+                            curl_multi_remove_handle($mh, $info['handle']);
                             if ((int) $info['result'] || !$output) {
-                                curl_multi_remove_handle($mh, $info['handle']);
                                 if ($this->chDataArr[$index]['reRequest'] > 0) {
                                     curl_close($info['handle']);
                                     curl_multi_add_handle($mh, $this->getCh($index));
@@ -137,7 +137,6 @@ class Multi
                                     yield $index => new Statement((int) $info['result'], $info['handle'], $output);
                                 }
                             } else {
-                                curl_multi_remove_handle($mh, $info['handle']);
                                 yield $index => new Statement(0, $info['handle'], $output, $this->chDataArr[$index]['cookieJar']);
                             }
                         }
