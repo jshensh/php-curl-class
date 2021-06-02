@@ -211,7 +211,7 @@
             border-left: 1px solid #24292e
         }
 
-        .cm-s-github-light div.CodeMirror-selected,.cm-s-github-light .CodeMirror-line::-moz-selection,.cm-s-github-light .CodeMirror-line>span::-moz-selection,.cm-s-github-light .CodeMirror-line>span>span::-moz-selection,.cm-s-github-light .CodeMirror-line::-moz-selection,.cm-s-github-light .CodeMirror-line>span::-moz-selection,.cm-s-github-light .CodeMirror-line>span>span::-moz-selection {
+        .cm-s-github-light div.CodeMirror-selected,.cm-s-github-light .CodeMirror-line::-moz-selection,.cm-s-github-light .CodeMirror-line>span::-moz-selection,.cm-s-github-light .CodeMirror-line>span>span::-moz-selection {
             background: #c8c8fa
         }
 
