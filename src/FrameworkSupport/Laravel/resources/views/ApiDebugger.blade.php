@@ -343,7 +343,7 @@
 
             for (var i = 0; i < paramKeyInputs.length; i++) {
                 var uuid = paramKeyInputs[i].id.match(/^(header|param)(?:_)(.*)(?:_(key|value))$/);
-                $('#paramsContainer').find(`input[id$="${uuid[2]}_value"]`).attr('name', paramKeyInputs[i].value);
+                $('#paramsContainer').find(`input[id$="${uuid[2]}_value"],textarea[id$="${uuid[2]}_value"]`).attr('name', paramKeyInputs[i].value);
             }
 
             $(formDom).find('button[type="submit"]').attr('disabled', 'disabled');
@@ -569,13 +569,14 @@
 
                 var rowDom = $('<div>').addClass('row').css('margin-bottom', '15px'),
                     contianerDom = $('<div>').addClass('col-xs-12'),
-                    inputGroupDom = $('<div>').addClass('input-group'),
+                    inputGroupDom = $('<div>').addClass('input-group').css('height', '100%'),
                     keyInputDom = $('<input>').addClass('form-control')
                         .attr('id', `${domName}_key`)
                         .attr('type', 'text')
                         .attr('placeholder', 'Key')
                         .attr('value', value['key'])
-                        .attr('aria-describedby', domName),
+                        .attr('aria-describedby', domName)
+                        .css('height', '100%'),
                     inputGroupAddonDom = $('<span>').attr('id', domName)
                         .addClass('input-group-addon')
                         .attr('autocomplete', 'off')
@@ -587,19 +588,29 @@
                     deleteButtonContainerDom = $('<span>').addClass('input-group-addon').css('border', 0).css('padding', 0),
                     descriptionDom = $('<p>').addClass('help-block');
 
-                if (type === 'file') {
-                    var valueInputDom = $('<input>').addClass('form-control')
-                        .attr('id', `${domName}_value`)
-                        .attr('type', 'file')
-                        .attr('aria-describedby', domName);
-                } else {
-                    var valueInputDom = $('<input>').addClass('form-control')
-                        .attr('id', `${domName}_value`)
-                        .attr('type', 'text')
-                        .attr('placeholder', 'Value')
-                        .attr('autocomplete', 'off')
-                        .attr('value', value['value'])
-                        .attr('aria-describedby', domName);
+                switch (type) {
+                    case 'file':
+                        var valueInputDom = $('<input>').addClass('form-control')
+                            .attr('id', `${domName}_value`)
+                            .attr('type', 'file')
+                            .attr('aria-describedby', domName);
+                        break;
+                    case 'textarea':
+                        var valueInputDom = $('<textarea>').addClass('form-control')
+                            .attr('id', `${domName}_value`)
+                            .attr('type', 'file')
+                            .attr('aria-describedby', domName)
+                            .attr('rows', '5')
+                            .val(value['value']);
+                        break;
+                    default:
+                        var valueInputDom = $('<input>').addClass('form-control')
+                            .attr('id', `${domName}_value`)
+                            .attr('type', 'text')
+                            .attr('placeholder', 'Value')
+                            .attr('autocomplete', 'off')
+                            .val(value['value'])
+                            .attr('aria-describedby', domName);
                 }
 
                 var renderDom = rowDom.append(
@@ -727,6 +738,7 @@
                                 switch (api['params'][i]['type']) {
                                     case 'file':
                                     case 'text':
+                                    case 'textarea':
                                         $('#paramsContainer').append(
                                             inputDomRender(
                                                 'param',
