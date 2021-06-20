@@ -496,6 +496,8 @@ class Client extends Common
                     } else {
                         curl_setopt($ch, CURLOPT_POSTFIELDS, $this->conf['postFieldsBuildQuery'] ? http_build_query($this->conf['postFields']) : $this->conf['postFields']);
                     }
+                } else {
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $this->conf['postFields']);
                 }
             } else {
                 if (is_string($this->conf['postFields'])) {
