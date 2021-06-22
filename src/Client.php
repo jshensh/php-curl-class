@@ -41,8 +41,8 @@ class Client extends Common
                 'postFieldsMultiPart'  => false
             ],
             $defaultCurlopt = [
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_ENCODING       => '',
                 CURLOPT_NOBODY         => false,
                 CURLOPT_HEADER         => true
@@ -267,8 +267,6 @@ class Client extends Common
         switch ($k) {
             case CURLOPT_SSL_VERIFYPEER:
                 // no break
-            case CURLOPT_SSL_VERIFYHOST:
-                // no break
             case CURLOPT_NOBODY:
                 // no break
             case CURLOPT_HEADER:
@@ -276,6 +274,12 @@ class Client extends Common
                     return $this;
                 }
                 break;
+            case CURLOPT_SSL_VERIFYHOST:
+                if (!is_numeric($v)) {
+                    return $this;
+                }
+                break;
+                // no break
             case CURLOPT_ENCODING:
                 // no break
             case CURLOPT_SSLCERT:

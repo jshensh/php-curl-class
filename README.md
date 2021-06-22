@@ -141,8 +141,8 @@ use CustomCurl\Client;
 $headerSize = -1;
 
 $curlObj = Client::init('http://example.com')
-    ->setCurlOpt(CURLOPT_SSL_VERIFYPEER, true)                                    // CURLOPT_SSL_VERIFYPEER，默认值 False
-    ->setCurlOpt(CURLOPT_SSL_VERIFYHOST, true)                                    // CURLOPT_SSL_VERIFYHOST，默认值 False
+    ->setCurlOpt(CURLOPT_SSL_VERIFYPEER, false)                                   // CURLOPT_SSL_VERIFYPEER，默认值 True
+    ->setCurlOpt(CURLOPT_SSL_VERIFYHOST, 0)                                       // CURLOPT_SSL_VERIFYHOST，默认值 2
     ->setCurlOpt(CURLOPT_NOBODY, false)                                           // CURLOPT_NOBODY，默认值 False
     ->setCurlOpt(CURLOPT_HEADER, true)                                            // CURLOPT_HEADER，默认值 True
     ->setCurlOpt(CURLOPT_ENCODING, '')                                            // CURLOPT_ENCODING，默认值 ''
@@ -356,8 +356,8 @@ var_dump($curlObj3->getHeader(), $curlObj3->getCookies(), $curlObj3->getBody(), 
 ```php
 use CustomCurl\Client;
 
-Client::setCurlOptConf(CURLOPT_SSL_VERIFYPEER, true);   // CURLOPT_SSL_VERIFYPEER，默认值 False
-Client::setCurlOptConf(CURLOPT_SSL_VERIFYHOST, true);   // CURLOPT_SSL_VERIFYHOST，默认值 False
+Client::setCurlOptConf(CURLOPT_SSL_VERIFYPEER, false);  // CURLOPT_SSL_VERIFYPEER，默认值 True
+Client::setCurlOptConf(CURLOPT_SSL_VERIFYHOST, 0);      // CURLOPT_SSL_VERIFYHOST，默认值 2
 Client::setCurlOptConf(CURLOPT_ENCODING, 'gzip');       // CURLOPT_ENCODING，默认值 ''
 // 以上为所有可修改的全局 CurlOpt 配置项
 

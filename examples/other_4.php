@@ -1,8 +1,8 @@
 <?php
 use CustomCurl\Client;
 
-Client::setCurlOptConf(CURLOPT_SSL_VERIFYPEER, true);   // CURLOPT_SSL_VERIFYPEER，默认值 False
-Client::setCurlOptConf(CURLOPT_SSL_VERIFYHOST, true);   // CURLOPT_SSL_VERIFYHOST，默认值 False
+Client::setCurlOptConf(CURLOPT_SSL_VERIFYPEER, false);  // CURLOPT_SSL_VERIFYPEER，默认值 True
+Client::setCurlOptConf(CURLOPT_SSL_VERIFYHOST, 0);      // CURLOPT_SSL_VERIFYHOST，默认值 2
 Client::setCurlOptConf(CURLOPT_ENCODING, 'gzip');       // CURLOPT_ENCODING，默认值 ''
 // 以上为所有可修改的全局 CurlOpt 配置项
 
