@@ -3,6 +3,12 @@ Custom Curl (嗯懒得取名字)
 
 对 PHP 自带 curl 的一个简单的封装，支持链式操作。
 
+## 安装
+
+```shell
+composer require jshensh/php-curl-class
+```
+
 ## 使用示例
 
 ### GET 方法
