@@ -293,6 +293,10 @@ class Client extends Common
             case CURLOPT_SSLKEYPASSWD:
                 // no break
             case CURLOPT_SSLKEYTYPE:
+                // no break
+            case CURLOPT_CAINFO:
+                // no break
+            case CURLOPT_CAPATH:
                 if (!is_string($v)) {
                     return $this;
                 }
