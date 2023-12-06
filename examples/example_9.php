@@ -23,19 +23,19 @@ class Client extends \CustomCurl\Client
     }
 }
 
-    $pKey = <<<EOF
+$pKey = <<<EOF
 -----BEGIN PRIVATE KEY-----
 ***************************
 -----END PRIVATE KEY-----
 EOF;
 
-    $curlObj = Client::init('https://api.mch.weixin.qq.com/v3/certificates', 'GET')
-        ->setHeader('Accept', 'application/json')
-        ->sign('166*******', '****************************************', $pKey)
-        ->exec();
+$curlObj = Client::init('https://api.mch.weixin.qq.com/v3/certificates', 'GET')
+    ->setHeader('Accept', 'application/json')
+    ->sign('166*******', '****************************************', $pKey)
+    ->exec();
 
-    if (!$curlObj->getStatus()) {
-        throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
-    }
+if (!$curlObj->getStatus()) {
+    throw new \Exception('Curl Error', $curlObj->getCurlErrNo());
+}
 
-    var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
+var_dump($curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
