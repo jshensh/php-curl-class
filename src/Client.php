@@ -21,7 +21,7 @@ use CustomCurl\Multi;
  */
 class Client extends Common
 {
-    private static $defaultConf = [
+    protected static $defaultConf = [
                 'timeout'              => 5,
                 'reRequest'            => 3,
                 'maxRedirs'            => 3,
@@ -50,7 +50,7 @@ class Client extends Common
             $userConf = [],
             $userCurlopt = [];
 
-    private $url = '',
+    protected $url = '',
             $method = '',
             $conf = [
                 'postFields' => []
@@ -60,12 +60,12 @@ class Client extends Common
 
     /**
      * 构造方法
-     * @access private
+     * @access protected
      * @param string $url URL 字符串
      * @param string $method 请求方法，[get, post, put, delete]
      * @return void
      */
-    private function __construct($url, $method)
+    protected function __construct($url, $method)
     {
         $this->url = $url;
         $method = strtolower($method);
@@ -168,7 +168,7 @@ class Client extends Common
      */
     public static function init($url, $method = 'get')
     {
-        return new self($url, $method);
+        return new static($url, $method);
     }
 
     /**
@@ -414,12 +414,12 @@ class Client extends Common
 
     /**
      * 创建 Multi Part 表单请求
-     * @access private
+     * @access protected
      * @param array $fields 需要传输的表单内容（不含文件）
      * @return $this
      */
-    // private function buildMultiPartRequest($fields, $files)
-    private function buildMultiPartRequest($fields)
+    // protected function buildMultiPartRequest($fields, $files)
+    protected function buildMultiPartRequest($fields)
     {
         $boundary = uniqid();
         $delimiter = '-------------' . $boundary;
