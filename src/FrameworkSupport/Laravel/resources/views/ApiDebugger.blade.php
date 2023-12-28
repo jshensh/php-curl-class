@@ -369,8 +369,9 @@
                     default:
                         switch ($('#header_content_type_value').val()) {
                             case '':
-                            case 'application/x-www-form-urlencoded':
                                 return new FormData($('#paramsContainer')[0]);
+                            case 'application/x-www-form-urlencoded':
+                                return $('#paramsContainer').serialize();
                             default:
                                 return requestJsonCodeEditor.getValue();
                         }
