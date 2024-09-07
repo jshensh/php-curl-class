@@ -28,6 +28,7 @@ class Client extends Common
                 'ignoreCurlError'      => false,
                 'followLocation'       => false,
                 'referer'              => '',
+                'resolve'              => '',
                 'userAgent'            => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36',
                 'customHeader'         => [],
                 'sendCookies'          => [],
@@ -226,6 +227,8 @@ class Client extends Common
                 $v = (bool)$v;
                 break;
             case 'referer':
+                // no break
+            case 'resolve':
                 // no break
             case 'proxy':
                 // no break
@@ -464,6 +467,7 @@ class Client extends Common
         curl_setopt($ch, CURLOPT_MAXREDIRS, $this->conf['maxRedirs']);
         curl_setopt($ch, CURLOPT_AUTOREFERER, $this->conf['autoRefer']);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($this->method));
+        curl_setopt($ch, CURLOPT_RESOLVE, array($this->conf['resolve']));
         if (count($this->conf['sendCookies'])) {
             $this->cookieJarObj = $this->conf['sendCookies'];
             $sendCookies = '';
