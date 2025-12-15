@@ -65,7 +65,7 @@ class Multi
      * 获取 $clientArr 中的 Curl 句柄
      * @access private
      * @param int|string $clientIndex 索引
-     * @return resource
+     * @return array
      */
     private function getCh($clientIndex = null)
     {
@@ -94,7 +94,7 @@ class Multi
             ];
         }
 
-        return $this->chArr[$clientIndex];
+        return [$clientIndex, $this->chArr[$clientIndex]];
     }
 
     /**
@@ -122,13 +122,13 @@ class Multi
             }
 
             // getCh() 返回 handle，对应 index 就是 handle 在 $chArr 的 key
-            $index = array_search($ch, $this->chArr, true);
+            $index = $ch[0];
             if ($index === false) {
                 continue;
             }
 
-            curl_multi_add_handle($mh, $ch);
-            $chInt = (int)$ch;
+            curl_multi_add_handle($mh, $ch[1]);
+            $chInt = (int)$ch[1];
             $runningHandles[$chInt] = $index;
             $handleMap[$chInt] = $index;
         }
@@ -168,8 +168,8 @@ class Multi
                         curl_close($info['handle']);
                         $retryCh = $this->getCh($index);
                         if ($retryCh) {
-                            curl_multi_add_handle($mh, $retryCh);
-                            $retryChInt = (int)$retryCh;
+                            curl_multi_add_handle($mh, $retryCh[1]);
+                            $retryChInt = (int)$retryCh[1];
                             $runningHandles[$retryChInt] = $index;
                             $handleMap[$retryChInt] = $index;
                         }
@@ -196,13 +196,10 @@ class Multi
                     break;
                 }
 
-                $index = array_search($ch, $this->chArr, true);
-                if ($index === false) {
-                    continue;
-                }
+                $index = $ch[0];
 
-                curl_multi_add_handle($mh, $ch);
-                $chInt = (int)$ch;
+                curl_multi_add_handle($mh, $ch[1]);
+                $chInt = (int)$ch[1];
                 $runningHandles[$chInt] = $index;
                 $handleMap[$chInt] = $index;
             }

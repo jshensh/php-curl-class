@@ -450,7 +450,7 @@ class Client extends Common
     /**
      * 获取 Curl 句柄
      * @access public
-     * @return resource
+     * @return resource|\CurlHandle
      */
     public function getHandle()
     {
