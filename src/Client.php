@@ -416,7 +416,7 @@ class Client extends Common
      * 创建 Multi Part 表单请求
      * @access protected
      * @param array $fields 需要传输的表单内容（不含文件）
-     * @return $this
+     * @return array
      */
     // protected function buildMultiPartRequest($fields, $files)
     protected function buildMultiPartRequest($fields)

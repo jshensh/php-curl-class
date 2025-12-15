@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | Custom Curl
 // +----------------------------------------------------------------------
-// | Copyright (c) 2024 http://233.imjs.work All rights reserved.
+// | Copyright (c) 2026 http://233.imjs.work All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( https://www.gnu.org/licenses/gpl-3.0.html )
 // +----------------------------------------------------------------------
@@ -123,10 +123,6 @@ class Multi
 
             // getCh() 返回 handle，对应 index 就是 handle 在 $chArr 的 key
             $index = $ch[0];
-            if ($index === false) {
-                continue;
-            }
-
             curl_multi_add_handle($mh, $ch[1]);
             $chInt = (int)$ch[1];
             $runningHandles[$chInt] = $index;
@@ -197,7 +193,6 @@ class Multi
                 }
 
                 $index = $ch[0];
-
                 curl_multi_add_handle($mh, $ch[1]);
                 $chInt = (int)$ch[1];
                 $runningHandles[$chInt] = $index;
@@ -208,5 +203,4 @@ class Multi
 
         curl_multi_close($mh);
     }
-
 }
