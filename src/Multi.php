@@ -75,6 +75,7 @@ class Multi
             }
 
             $clientIndex = $this->chGenerator->key();
+            $this->chGenerator->next();
         }
 
         if (!isset($this->clientArr[$clientIndex])) {
@@ -93,7 +94,6 @@ class Multi
             ];
         }
 
-        $this->chGenerator->next();
         return $this->chArr[$clientIndex];
     }
 
