@@ -35,7 +35,10 @@ class Multi
      */
     private function getChGenerator()
     {
-        yield from $this->clientArr;
+        // make function getChGenerator compatible with PHP 5.6
+        foreach ($this->clientArr as $key => $value) {
+            yield $key => $value;
+        }
     }
 
     /**
@@ -104,55 +107,109 @@ class Multi
         $mh = curl_multi_init();
         $active = null;
 
-        for ($i = 0; $i < ($this->multiOptions['concurrency'] !== null ? $this->multiOptions['concurrency'] : count($this->clientArr)); $i++) {
+        $concurrency = isset($this->multiOptions['concurrency'])
+            ? $this->multiOptions['concurrency']
+            : count($this->clientArr);
+
+        $runningHandles = []; // key = (int)$handle, value = 用户 index
+        $handleMap = [];      // key = (int)$handle, value = 用户 index
+
+        // 初始化并发 handle
+        for ($i = 0; $i < $concurrency; $i++) {
             $ch = $this->getCh();
             if (!$ch) {
                 break;
             }
-            curl_multi_add_handle($mh, $ch);
-        }
 
-        $reRequestPool = [];
+            // getCh() 返回 handle，对应 index 就是 handle 在 $chArr 的 key
+            $index = array_search($ch, $this->chArr, true);
+            if ($index === false) {
+                continue;
+            }
+
+            curl_multi_add_handle($mh, $ch);
+            $chInt = (int)$ch;
+            $runningHandles[$chInt] = $index;
+            $handleMap[$chInt] = $index;
+        }
 
         do {
-            $mrc = curl_multi_exec($mh, $active);
-        } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+            do {
+                $mrc = curl_multi_exec($mh, $active);
+            } while ($mrc == CURLM_CALL_MULTI_PERFORM);
 
-        while ($active && $mrc == CURLM_OK) {
-            if (curl_multi_select($mh) != -1) {
-                do {
-                    $mrc = curl_multi_exec($mh, $active);
-                    while ($info = curl_multi_info_read($mh)) {
-                        $index = array_search($info['handle'], $this->chArr, true);
-                        if ($index !== false) {
-                            $this->chDataArr[$index]['reRequest']--;
-                            $output = curl_multi_getcontent($info['handle']);
-                            curl_multi_remove_handle($mh, $info['handle']);
-                            if ((int) $info['result'] || !$output) {
-                                if ($this->chDataArr[$index]['reRequest'] > 0) {
-                                    curl_close($info['handle']);
-                                    curl_multi_add_handle($mh, $this->getCh($index));
-                                    $mrc = curl_multi_exec($mh, $active);
-                                } else {
-                                    yield $index => new Statement((int) $info['result'], $info['handle'], $output);
-                                }
-                            } else {
-                                yield $index => new Statement(0, $info['handle'], $output, $this->chDataArr[$index]['cookieJar']);
-                            }
-                        }
-                    }
-                } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+            if ($active) {
+                curl_multi_select($mh);
             }
 
-            if ($reRequestPool || ($this->multiOptions['concurrency'] !== null && $active < $this->multiOptions['concurrency'])) {
-                $nextCh = $this->getCh();
-                if ($nextCh) {
-                    curl_multi_add_handle($mh, $nextCh);
-                    $mrc = curl_multi_exec($mh, $active);
+            // 处理完成的 handle
+            while ($info = curl_multi_info_read($mh)) {
+                $chInt = (int)$info['handle'];
+
+                if (!isset($handleMap[$chInt])) {
+                    curl_multi_remove_handle($mh, $info['handle']);
+                    curl_close($info['handle']);
+                    unset($runningHandles[$chInt]);
+                    continue;
                 }
-            }
-        }
 
-        return true;
+                $index = $handleMap[$chInt];
+                unset($handleMap[$chInt], $runningHandles[$chInt]);
+
+                $output = curl_multi_getcontent($info['handle']);
+                curl_multi_remove_handle($mh, $info['handle']);
+
+                // 更新重试次数
+                $this->chDataArr[$index]['reRequest']--;
+
+                // 判断是否需要重试
+                if ((int)$info['result'] !== 0 || !$output) {
+                    if ($this->chDataArr[$index]['reRequest'] > 0) {
+                        curl_close($info['handle']);
+                        $retryCh = $this->getCh($index);
+                        if ($retryCh) {
+                            curl_multi_add_handle($mh, $retryCh);
+                            $retryChInt = (int)$retryCh;
+                            $runningHandles[$retryChInt] = $index;
+                            $handleMap[$retryChInt] = $index;
+                        }
+                        continue; // 不 yield
+                    }
+                }
+
+                // 成功或耗尽重试才 yield
+                yield $index => new Statement(
+                    (int)$info['result'],
+                    $info['handle'],
+                    $output,
+                    $this->chDataArr[$index]['cookieJar']
+                );
+
+                // 释放 handle
+                curl_close($info['handle']);
+            }
+
+            // 补充 handle 保持并发
+            while (count($runningHandles) < $concurrency && $this->chGenerator->valid()) {
+                $ch = $this->getCh();
+                if (!$ch) {
+                    break;
+                }
+
+                $index = array_search($ch, $this->chArr, true);
+                if ($index === false) {
+                    continue;
+                }
+
+                curl_multi_add_handle($mh, $ch);
+                $chInt = (int)$ch;
+                $runningHandles[$chInt] = $index;
+                $handleMap[$chInt] = $index;
+            }
+
+        } while (!empty($runningHandles) || $this->chGenerator->valid());
+
+        curl_multi_close($mh);
     }
+
 }
