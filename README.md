@@ -202,8 +202,6 @@ foreach ($multiCurl as $k => $curlObj) {
     var_dump($k, $curlObj->getStatus(), $curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 }
 
-var_dump($multiCurl->getReturn());
-
 var_dump($cookieJar);
 
 $multiCurl = Client::multi([
@@ -214,8 +212,6 @@ $multiCurl = Client::multi([
 foreach ($multiCurl as $k => $curlObj) {
     var_dump($k, $curlObj->getStatus(), $curlObj->getHeader(), $curlObj->getCookies(), $curlObj->getBody(), $curlObj->getInfo());
 }
-
-var_dump($multiCurl->getReturn());
 
 var_dump($cookieJar);
 ```
